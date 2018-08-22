@@ -8,7 +8,7 @@ import java.io.IOException;
 public class Directory extends TFile {
     @Override
     public void create(Template template, File target) throws TemplateExecutionException {
-        File f = new File(target + File.separator + path.replace('/',File.separatorChar));
+        File f = new File(target + File.separator + getPath(template));
         if( ! f.exists() ) {
             try {
                 FileUtils.mkdirs(f);

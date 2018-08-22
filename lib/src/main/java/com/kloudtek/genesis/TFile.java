@@ -1,6 +1,7 @@
 package com.kloudtek.genesis;
 
 import com.kloudtek.util.FileUtils;
+import com.kloudtek.util.StringUtils;
 import com.kloudtek.util.io.IOUtils;
 
 import javax.xml.bind.annotation.XmlAttribute;
@@ -15,9 +16,13 @@ public class TFile {
     @XmlAttribute
     private Boolean trim;
 
+    public String getPath(Template template) {
+        return StringUtils.substituteVariables(path.replace('/', File.separatorChar),template.getVariables());
+    }
+
     public void create(Template template, File target) throws TemplateExecutionException {
         try {
-            File fh = new File(target + File.separator + path.replace('/', File.separatorChar));
+            File fh = new File(target + File.separator + getPath(template));
             File parent = fh.getParentFile();
             if (!parent.exists()) {
                 FileUtils.mkdirs(parent);
