@@ -87,4 +87,12 @@ public class Template {
     public void setVariable(String id, String val) {
         variables.put(id, val);
     }
+
+    public TemplateEngine getEngine(String name) throws TemplateExecutionException {
+        if( name.equalsIgnoreCase("simple") ) {
+            return new SimpleTemplateEngine();
+        } else {
+            throw new TemplateExecutionException("Invalid template engine: "+name);
+        }
+    }
 }

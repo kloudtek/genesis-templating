@@ -22,7 +22,7 @@ public class TFile {
             if (!parent.exists()) {
                 FileUtils.mkdirs(parent);
             }
-            try ( FileOutputStream os = new FileOutputStream(fh); InputStream is = getContent() ) {
+            try ( FileOutputStream os = new FileOutputStream(fh); InputStream is = getContent(template) ) {
                 IOUtils.copy(is,os);
             }
         } catch (IOException e) {
@@ -30,13 +30,16 @@ public class TFile {
         }
     }
 
-    private InputStream getContent() throws TemplateExecutionException {
+    private InputStream getContent(Template template) throws TemplateExecutionException {
         if( content == null ) {
             throw new TemplateExecutionException("Content missing from "+path);
         }
         if(trim == null || trim) {
             content = content.trim();
         }
-        return new ByteArrayInputStream(content.getBytes());
+        InputStream is = new ByteArrayInputStream(content.getBytes());
+        TemplateEngine engine = template.getEngine("simple");
+        is = engine.process(template, is);
+        return is;
     }
 }
