@@ -1,0 +1,23 @@
+<template defaultType="simple">
+    <title>Simple maven Project</title>
+    <questions>
+        <question id="artifactId" content="Project Maven Artifact Id"/>
+        <question id="projName" content="Project Name" default="${artifactId}"/>
+        <question id="groupId" content="Maven Group Id"/>
+    </questions>
+    <files>
+        <dir path="src">
+            <dir path="main">
+                <dir path="java"/>
+                <dir path="resources"/>
+            </dir>
+            <dir path="test">
+                <dir path="java"/>
+                <dir path="resources"/>
+            </dir>
+        </dir>
+        <file path="README.md">
+            # ${artifactId}
+        </file>
+    </files>
+</template>
