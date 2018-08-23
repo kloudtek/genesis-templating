@@ -1,4 +1,4 @@
-<template defaultType="simple">
+<template>
     <title>Simple maven Project</title>
     <questions>
         <question id="artifactId" content="Project Maven Artifact Id"/>
@@ -19,5 +19,6 @@
         <file path="README.md">
             # ${artifactId}
         </file>
+        <file path="pom.xml" resource="simplepom.xml"/>
     </files>
 </template>

@@ -1,6 +1,9 @@
 package com.kloudtek.genesis;
 
 import com.kloudtek.util.xml.XmlUtils;
+import freemarker.cache.StringTemplateLoader;
+import freemarker.template.Configuration;
+import freemarker.template.TemplateException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,8 +18,6 @@ import java.util.Map;
 @XmlRootElement
 public class Template {
     private static final Logger logger = LoggerFactory.getLogger(Template.class);
-    @XmlAttribute
-    private TemplateEngineType defaultType = TemplateEngineType.NONE;
     @XmlElement(name = "question")
     @XmlElementWrapper
     private List<Question> questions;
@@ -25,8 +26,29 @@ public class Template {
             @XmlElement(name = "file", type = TFile.class),
             @XmlElement(name = "dir", type = Directory.class)
     })
-    private List<TFile> files;
+    private List<FSObj> files;
     private Map<String, String> variables = new HashMap<>();
+    private final Configuration fmCfg;
+
+    public Template() {
+        fmCfg = new Configuration(Configuration.VERSION_2_3_28);
+        fmCfg.setDefaultEncoding("UTF-8");
+        fmCfg.setLogTemplateExceptions(false);
+        fmCfg.setWrapUncheckedExceptions(true);
+    }
+
+    public synchronized String process(String text) throws TemplateExecutionException {
+        try {
+            StringTemplateLoader templateLoader = new StringTemplateLoader();
+            templateLoader.putTemplate("template", text);
+            fmCfg.setTemplateLoader(templateLoader);
+            StringWriter buf = new StringWriter();
+            fmCfg.getTemplate("template").process(variables, buf);
+            return buf.toString();
+        } catch (TemplateException | IOException e) {
+            throw new TemplateExecutionException(e);
+        }
+    }
 
     public static Template create(String path) throws TemplateNotFoundException, InvalidTemplateException, IOException {
         try (InputStream is = getStream(path)) {
@@ -60,6 +82,12 @@ public class Template {
     }
 
     public void generate(File target) throws TemplateExecutionException {
+        for (Question question : questions) {
+            question.setTemplate(this);
+        }
+        for (FSObj file : files) {
+            file.setTemplate(this);
+        }
         logger.info("Generating template to " + target);
         if (!target.exists()) {
             if (!target.mkdirs()) {
@@ -70,12 +98,12 @@ public class Template {
         }
         if (questions != null) {
             for (Question question : questions) {
-                question.ask(this);
+                question.ask();
             }
         }
         if (files != null) {
-            for (TFile file : files) {
-                file.create(this,target);
+            for (FSObj file : files) {
+                file.create(target);
             }
         }
     }
@@ -86,13 +114,5 @@ public class Template {
 
     public void setVariable(String id, String val) {
         variables.put(id, val);
-    }
-
-    public TemplateEngine getEngine(String name) throws TemplateExecutionException {
-        if( name.equalsIgnoreCase("simple") ) {
-            return new SimpleTemplateEngine();
-        } else {
-            throw new TemplateExecutionException("Invalid template engine: "+name);
-        }
     }
 }

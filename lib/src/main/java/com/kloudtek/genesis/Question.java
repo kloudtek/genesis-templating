@@ -13,9 +13,14 @@ public class Question {
     private String content;
     @XmlAttribute(name = "default")
     private String defaultValue;
+    private Template template;
 
-    public void ask(Template template) {
-        String val = ConsoleUtils.read(content, defaultValue != null ? StringUtils.substituteVariables(defaultValue, template.getVariables()) : null);
+    public void ask() throws TemplateExecutionException {
+        String val = ConsoleUtils.read(content, defaultValue != null ? template.process(defaultValue) : null);
         template.setVariable(id,val);
+    }
+
+    public void setTemplate(Template template) {
+        this.template = template;
     }
 }

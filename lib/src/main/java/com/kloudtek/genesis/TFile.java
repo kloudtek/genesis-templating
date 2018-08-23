@@ -8,43 +8,65 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlValue;
 import java.io.*;
 
-public class TFile {
-    @XmlAttribute
-    protected String path;
-    @XmlValue
-    private String content;
+import static com.kloudtek.util.StringUtils.utf8;
+
+public class TFile extends FSObj {
     @XmlAttribute
     private Boolean trim;
+    @XmlAttribute
+    private Boolean process;
+    @XmlAttribute
+    private String encoding;
+    @XmlAttribute
+    private String resource;
 
-    public String getPath(Template template) {
-        return StringUtils.substituteVariables(path.replace('/', File.separatorChar),template.getVariables());
-    }
-
-    public void create(Template template, File target) throws TemplateExecutionException {
+    public void create(File target) throws TemplateExecutionException {
         try {
-            File fh = new File(target + File.separator + getPath(template));
+            File fh = new File(target + File.separator + getPath());
             File parent = fh.getParentFile();
             if (!parent.exists()) {
                 FileUtils.mkdirs(parent);
             }
-            try ( FileOutputStream os = new FileOutputStream(fh); InputStream is = getContent(template) ) {
-                IOUtils.copy(is,os);
+            try (FileOutputStream os = new FileOutputStream(fh); InputStream is = getContent()) {
+                IOUtils.copy(is, os);
             }
         } catch (IOException e) {
             throw new TemplateExecutionException(e);
         }
     }
 
-    private InputStream getContent(Template template) throws TemplateExecutionException {
-        if( content == null ) {
-            throw new TemplateExecutionException("Content missing from "+path);
+    private InputStream getContent() throws TemplateExecutionException {
+        try {
+            if (StringUtils.isNotBlank(resource)) {
+                if (!resource.startsWith("/")) {
+                    resource = "/" + resource;
+                }
+                resource = template.process(resource);
+                try (InputStream is = getClass().getResourceAsStream(resource)) {
+                    if (process == null || process) {
+                        content = IOUtils.toString(is, getEncoding());
+                    } else {
+                        return is;
+                    }
+                }
+            }
+            if (content == null) {
+                throw new TemplateExecutionException("Content missing from " + path);
+            }
+            if (trim == null || trim) {
+                content = content.trim();
+            }
+            if (process == null || process) {
+                return new ByteArrayInputStream(template.process(content).getBytes(getEncoding()));
+            } else {
+                return new ByteArrayInputStream(content.getBytes(getEncoding()));
+            }
+        } catch (IOException e) {
+            throw new TemplateExecutionException(e);
         }
-        if(trim == null || trim) {
-            content = content.trim();
-        }
-        InputStream is = new ByteArrayInputStream(content.getBytes());
-        TemplateEngine engine = template.getEngine("simple");
-        is = engine.process(template, is);
-        return is;
+    }
+
+    public String getEncoding() {
+        return encoding != null ? encoding : "UTF-8";
     }
 }
