@@ -17,6 +17,13 @@ public class Directory extends FSObj {
 
     @Override
     public void create(File target) throws TemplateExecutionException {
+        if( ignore != null ) {
+            if( ignore.equalsIgnoreCase("true") ) {
+                return;
+            } else if( ignore.equalsIgnoreCase("false") ) {
+                throw new TemplateExecutionException("Invalid ignore value: "+ignore);
+            }
+        }
         if( ! file.exists() ) {
             try {
                 FileUtils.mkdirs(file);
@@ -33,11 +40,11 @@ public class Directory extends FSObj {
 
 
     @Override
-    public void processPath(File target) throws TemplateExecutionException {
-        super.processPath(target);
+    public void process(File target) throws TemplateExecutionException {
+        super.process(target);
         if( files != null ) {
             for (FSObj f : files) {
-                f.processPath(file);
+                f.process(file);
             }
         }
     }

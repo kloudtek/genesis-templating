@@ -19,6 +19,9 @@
         <file path="README.md">
             # ${artifactId}
         </file>
+        <file path="ignorable.txt" ignore="&lt;#if artifactId = 'myproject'&gt;true&lt;#else&gt;false&lt;/#if&gt;">
+            im ignorable
+        </file>
         <file path="pom.xml" resource="simplepom.xml"/>
     </files>
 </template>

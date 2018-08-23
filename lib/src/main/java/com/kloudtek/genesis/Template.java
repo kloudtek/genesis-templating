@@ -106,9 +106,8 @@ public class Template {
             }
         }
         if (files != null) {
-            LinkedList<FSObj> processQueue = new LinkedList<>(files);
             for (FSObj file : files) {
-                file.processPath(target);
+                file.process(target);
             }
             if(checkConflicts()) {
                 // todo
