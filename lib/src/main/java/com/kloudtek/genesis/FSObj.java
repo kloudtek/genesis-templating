@@ -14,17 +14,23 @@ import java.util.List;
 public abstract class FSObj {
     @XmlAttribute
     protected String path;
+    protected File file;
     @XmlValue
     protected String content;
     protected Template template;
-
-    public String getPath() {
-        return StringUtils.substituteVariables(path.replace('/', File.separatorChar), template.getVariables());
-    }
 
     public abstract void create(File target) throws TemplateExecutionException;
 
     public void setTemplate(Template template) {
         this.template = template;
+    }
+
+    public boolean isConflict() {
+        return file.exists();
+    }
+
+    public void processPath(File target) throws TemplateExecutionException {
+        path = template.process(path);
+        file = new File(target + File.separator + path);
     }
 }

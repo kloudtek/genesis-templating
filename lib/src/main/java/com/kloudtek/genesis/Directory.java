@@ -17,17 +17,27 @@ public class Directory extends FSObj {
 
     @Override
     public void create(File target) throws TemplateExecutionException {
-        File f = new File(target + File.separator + getPath() );
-        if( ! f.exists() ) {
+        if( ! file.exists() ) {
             try {
-                FileUtils.mkdirs(f);
+                FileUtils.mkdirs(file);
             } catch (IOException e) {
                 throw new TemplateExecutionException(e);
             }
         }
         if( files != null ) {
-            for (FSObj file : files) {
-                file.create(f);
+            for (FSObj f : files) {
+                f.create(file);
+            }
+        }
+    }
+
+
+    @Override
+    public void processPath(File target) throws TemplateExecutionException {
+        super.processPath(target);
+        if( files != null ) {
+            for (FSObj f : files) {
+                f.processPath(file);
             }
         }
     }

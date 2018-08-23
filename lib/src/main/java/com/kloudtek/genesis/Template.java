@@ -11,9 +11,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.*;
 import java.io.*;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @XmlRootElement
 public class Template {
@@ -27,7 +25,10 @@ public class Template {
             @XmlElement(name = "dir", type = Directory.class)
     })
     private List<FSObj> files;
+    private boolean overwrite;
+    @XmlTransient
     private Map<String, String> variables = new HashMap<>();
+    @XmlTransient
     private final Configuration fmCfg;
 
     public Template() {
@@ -38,6 +39,9 @@ public class Template {
     }
 
     public synchronized String process(String text) throws TemplateExecutionException {
+        if (text == null) {
+            return null;
+        }
         try {
             StringTemplateLoader templateLoader = new StringTemplateLoader();
             templateLoader.putTemplate("template", text);
@@ -102,10 +106,26 @@ public class Template {
             }
         }
         if (files != null) {
+            LinkedList<FSObj> processQueue = new LinkedList<>(files);
+            for (FSObj file : files) {
+                file.processPath(target);
+            }
+            if(checkConflicts()) {
+                // todo
+            }
             for (FSObj file : files) {
                 file.create(target);
             }
         }
+    }
+
+    private boolean checkConflicts() throws TemplateExecutionException {
+        for (FSObj file : files) {
+            if( file.isConflict() ) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public Map<String, String> getVariables() {
@@ -114,5 +134,13 @@ public class Template {
 
     public void setVariable(String id, String val) {
         variables.put(id, val);
+    }
+
+    public boolean isOverwrite() {
+        return overwrite;
+    }
+
+    public void setOverwrite(boolean overwrite) {
+        this.overwrite = overwrite;
     }
 }

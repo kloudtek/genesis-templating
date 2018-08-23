@@ -5,10 +5,7 @@ import com.kloudtek.util.StringUtils;
 import com.kloudtek.util.io.IOUtils;
 
 import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlValue;
 import java.io.*;
-
-import static com.kloudtek.util.StringUtils.utf8;
 
 public class TFile extends FSObj {
     @XmlAttribute
@@ -22,12 +19,11 @@ public class TFile extends FSObj {
 
     public void create(File target) throws TemplateExecutionException {
         try {
-            File fh = new File(target + File.separator + getPath());
-            File parent = fh.getParentFile();
+            File parent = file.getParentFile();
             if (!parent.exists()) {
                 FileUtils.mkdirs(parent);
             }
-            try (FileOutputStream os = new FileOutputStream(fh); InputStream is = getContent()) {
+            try (FileOutputStream os = new FileOutputStream(file); InputStream is = getContent()) {
                 IOUtils.copy(is, os);
             }
         } catch (IOException e) {

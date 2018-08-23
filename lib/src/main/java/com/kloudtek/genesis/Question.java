@@ -1,10 +1,8 @@
 package com.kloudtek.genesis;
 
 import com.kloudtek.util.ConsoleUtils;
-import com.kloudtek.util.StringUtils;
 
 import javax.xml.bind.annotation.XmlAttribute;
-import java.util.Map;
 
 public class Question {
     @XmlAttribute
@@ -16,8 +14,8 @@ public class Question {
     private Template template;
 
     public void ask() throws TemplateExecutionException {
-        String val = ConsoleUtils.read(content, defaultValue != null ? template.process(defaultValue) : null);
-        template.setVariable(id,val);
+        String val = ConsoleUtils.read(content, template.process(defaultValue) );
+        template.setVariable(id, val);
     }
 
     public void setTemplate(Template template) {
