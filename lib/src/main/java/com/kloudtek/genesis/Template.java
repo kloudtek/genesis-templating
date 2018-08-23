@@ -136,6 +136,10 @@ public class Template {
         variables.put(id, val);
     }
 
+    public void addVariables(Map<String,String> vars ){
+        variables.putAll(vars);
+    }
+
     public boolean isOverwrite() {
         return overwrite;
     }

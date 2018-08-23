@@ -6,6 +6,7 @@ import picocli.CommandLine;
 import picocli.CommandLine.*;
 
 import java.io.File;
+import java.util.Map;
 import java.util.concurrent.Callable;
 
 public class GenesisCli implements Callable<Void> {
@@ -15,6 +16,8 @@ public class GenesisCli implements Callable<Void> {
     private String templatePath;
     @Parameters(index = "1", description = "target directory")
     private File target;
+    @Option(names = "-D")
+    private Map<String,String> vars;
 
     public static void main(String[] args) {
         CommandLine.call(new GenesisCli(), args);
@@ -23,6 +26,9 @@ public class GenesisCli implements Callable<Void> {
     public Void call() throws Exception {
         logger.info("Creating template using "+templatePath);
         Template template = Template.create(this.templatePath);
+        if( vars != null ) {
+            template.addVariables(vars);
+        }
         template.generate(target);
         return null;
     }
