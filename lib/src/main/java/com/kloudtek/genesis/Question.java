@@ -15,6 +15,9 @@ public class Question {
 
     public void ask() throws TemplateExecutionException {
         if( ! template.getVariables().containsKey(id) ) {
+            if( template.isNonInteractive() ) {
+                throw new TemplateExecutionException("Variable "+id+ " must be set since (nonInteractive mode activated)");
+            }
             String val = ConsoleUtils.read(content, template.filter(defaultValue) );
             template.setVariable(id, val);
         }
