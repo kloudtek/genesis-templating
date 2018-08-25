@@ -11,7 +11,9 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.*;
 import java.io.*;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @XmlRootElement
 public class Template {
@@ -96,12 +98,12 @@ public class Template {
     }
 
     public void generate(File target) throws TemplateExecutionException {
-        if( questions != null ) {
+        if (questions != null) {
             for (Question question : questions) {
                 question.setTemplate(this);
             }
         }
-        if( files != null ) {
+        if (files != null) {
             for (FSObj file : files) {
                 file.setTemplate(this);
             }
@@ -123,7 +125,7 @@ public class Template {
             for (FSObj file : files) {
                 file.process(target);
             }
-            if(checkConflicts()) {
+            if (checkConflicts()) {
                 // todo
             }
             for (FSObj file : files) {
@@ -134,7 +136,7 @@ public class Template {
 
     private boolean checkConflicts() throws TemplateExecutionException {
         for (FSObj file : files) {
-            if( file.isConflict() ) {
+            if (file.isConflict()) {
                 return true;
             }
         }
@@ -149,7 +151,7 @@ public class Template {
         variables.put(id, val);
     }
 
-    public void addVariables(Map<String,String> vars ){
+    public void addVariables(Map<String, String> vars) {
         variables.putAll(vars);
     }
 
@@ -159,5 +161,9 @@ public class Template {
 
     public void setOverwrite(boolean overwrite) {
         this.overwrite = overwrite;
+    }
+
+    public boolean containsVariable(String id) {
+        return variables != null && variables.containsKey(id);
     }
 }
