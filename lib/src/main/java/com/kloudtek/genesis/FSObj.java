@@ -28,8 +28,8 @@ public abstract class FSObj {
     }
 
     public void process(File target) throws TemplateExecutionException {
-        path = template.process(path);
+        path = template.filter(path);
         file = new File(target + File.separator + path);
-        ignore = template.process(ignore);
+        ignore = template.filter(ignore);
     }
 }

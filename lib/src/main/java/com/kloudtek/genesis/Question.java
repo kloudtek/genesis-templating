@@ -15,7 +15,7 @@ public class Question {
 
     public void ask() throws TemplateExecutionException {
         if( ! template.getVariables().containsKey(id) ) {
-            String val = ConsoleUtils.read(content, template.process(defaultValue) );
+            String val = ConsoleUtils.read(content, template.filter(defaultValue) );
             template.setVariable(id, val);
         }
     }

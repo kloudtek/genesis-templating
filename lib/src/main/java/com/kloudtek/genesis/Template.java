@@ -30,6 +30,8 @@ public class Template {
     private Map<String, String> variables = new HashMap<>();
     @XmlTransient
     private final Configuration fmCfg;
+    @XmlTransient
+    private boolean nonInteractive;
 
     public Template() {
         fmCfg = new Configuration(Configuration.VERSION_2_3_28);
@@ -38,7 +40,15 @@ public class Template {
         fmCfg.setWrapUncheckedExceptions(true);
     }
 
-    public synchronized String process(String text) throws TemplateExecutionException {
+    public boolean isNonInteractive() {
+        return nonInteractive;
+    }
+
+    public void setNonInteractive(boolean nonInteractive) {
+        this.nonInteractive = nonInteractive;
+    }
+
+    public synchronized String filter(String text) throws TemplateExecutionException {
         if (text == null) {
             return null;
         }
@@ -86,11 +96,15 @@ public class Template {
     }
 
     public void generate(File target) throws TemplateExecutionException {
-        for (Question question : questions) {
-            question.setTemplate(this);
+        if( questions != null ) {
+            for (Question question : questions) {
+                question.setTemplate(this);
+            }
         }
-        for (FSObj file : files) {
-            file.setTemplate(this);
+        if( files != null ) {
+            for (FSObj file : files) {
+                file.setTemplate(this);
+            }
         }
         logger.info("Generating template to " + target);
         if (!target.exists()) {

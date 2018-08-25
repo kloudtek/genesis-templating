@@ -37,7 +37,7 @@ public class TFile extends FSObj {
                 if (!resource.startsWith("/")) {
                     resource = "/" + resource;
                 }
-                resource = template.process(resource);
+                resource = template.filter(resource);
                 try (InputStream is = getClass().getResourceAsStream(resource)) {
                     if (process == null || process) {
                         content = IOUtils.toString(is, getEncoding());
@@ -53,7 +53,7 @@ public class TFile extends FSObj {
                 content = content.trim();
             }
             if (process == null || process) {
-                return new ByteArrayInputStream(template.process(content).getBytes(getEncoding()));
+                return new ByteArrayInputStream(template.filter(content).getBytes(getEncoding()));
             } else {
                 return new ByteArrayInputStream(content.getBytes(getEncoding()));
             }
