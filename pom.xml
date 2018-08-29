@@ -8,6 +8,38 @@
     <artifactId>genesis-templating</artifactId>
     <packaging>pom</packaging>
     <version>1.0-SNAPSHOT</version>
+    <description>Advanced project template technology</description>
+    <url>https://github.com/kloudtek/genesis-templating</url>
+
+    <organization>
+        <name>Kloudtek</name>
+        <url>http://www.kloudtek.com</url>
+    </organization>
+
+    <developers>
+        <developer>
+            <name>Dev Team</name>
+            <organization>Kloudtek</organization>
+        </developer>
+    </developers>
+
+    <issueManagement>
+        <system>Github</system>
+        <url>https://github.com/kloudtek/genesis-templating/issues</url>
+    </issueManagement>
+
+    <scm>
+        <url>scm:git:git@github.com:kloudtek/genesis-templating.git</url>
+        <connection>scm:git:git@github.com:kloudtek/genesis-templating.git</connection>
+        <developerConnection>scm:git:git@github.com:kloudtek/genesis-templating.git</developerConnection>
+    </scm>
+
+    <licenses>
+        <license>
+            <name>Apache License 2.0</name>
+            <url>https://www.apache.org/licenses/LICENSE-2.0</url>
+        </license>
+    </licenses>
 
     <modules>
         <module>lib</module>
@@ -20,10 +52,118 @@
         <maven.compiler.target>1.8</maven.compiler.target>
     </properties>
 
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-site-plugin</artifactId>
+                <version>3.7.1</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>2.10.3</version>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>2.3</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.sonatype.plugins</groupId>
+                <artifactId>nexus-staging-maven-plugin</artifactId>
+                <version>1.6.6</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <serverId>ossrh</serverId>
+                    <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+                    <autoReleaseAfterClose>true</autoReleaseAfterClose>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+
     <repositories>
         <repository>
-            <id>osshr</id>
-            <url>https://oss.sonatype.org/content/repositories/releases/</url>
+            <id>ossrh-snapshot</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+        </repository>
+        <repository>
+            <id>ossrh-releases</id>
+            <url>https://oss.sonatype.org/content/repositories/releases</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
         </repository>
     </repositories>
+
+    <distributionManagement>
+        <site>
+            <name>S3 Site</name>
+            <id>kloudtek-s3-docs</id>
+            <url>s3://docs.kloudtek.com/anypoint-tools</url>
+        </site>
+        <repository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
+        </repository>
+        <snapshotRepository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </snapshotRepository>
+    </distributionManagement>
+
+    <profiles>
+        <profile>
+            <id>release</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.kohsuke</groupId>
+                        <artifactId>pgp-maven-plugin</artifactId>
+                        <version>1.1</version>
+                        <executions>
+                            <execution>
+                                <id>sign-artifacts</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                                <configuration>
+                                    <secretkey>keyfile:${gpgfile}</secretkey>
+                                    <passphrase>literal:${gpgpass}</passphrase>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>
