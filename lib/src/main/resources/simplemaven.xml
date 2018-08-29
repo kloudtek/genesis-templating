@@ -1,10 +1,10 @@
 <template>
     <title>Simple maven Project</title>
-    <questions>
-        <question id="artifactId" content="Project Maven Artifact Id"/>
-        <question id="projName" content="Project Name" default="${artifactId}"/>
-        <question id="groupId" content="Maven Group Id"/>
-    </questions>
+    <steps>
+        <input id="artifactId" content="Project Maven Artifact Id"/>
+        <input id="projName" content="Project Name" default="${artifactId}"/>
+        <input id="groupId" content="Maven Group Id"/>
+    </steps>
     <files>
         <dir path="src">
             <dir path="main">

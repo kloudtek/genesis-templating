@@ -4,16 +4,17 @@ import com.kloudtek.genesis.InvalidTemplateException;
 import com.kloudtek.genesis.Template;
 import com.kloudtek.genesis.TemplateExecutionException;
 import com.kloudtek.genesis.TemplateNotFoundException;
+import com.kloudtek.util.StringUtils;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
-
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 
+import java.awt.*;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.util.Map;
 
 /**
@@ -21,14 +22,22 @@ import java.util.Map;
  */
 @Mojo( name = "template", defaultPhase = LifecyclePhase.INITIALIZE )
 public class TemplateMojo extends AbstractMojo {
-    @Parameter(defaultValue = "${genesistemplating.template}", property = "template", required = true)
+    @Parameter(defaultValue = "${genesis.template}", property = "template", required = true)
     private String template;
-    @Parameter(defaultValue = "${genesistemplating.target}", property = "target")
+    @Parameter(defaultValue = "${genesis.target}", property = "target")
     private File target;
-    @Parameter(defaultValue = "${genesistemplating.variables}", property = "vars")
+    @Parameter(property = "vars")
     private Map<String,String> vars;
-    @Parameter(defaultValue = "${genesistemplating.nonInteractive}", property = "nonInteractive")
+    @Parameter(property = "defaults")
+    private Map<String, String> defaults;
+    @Parameter(defaultValue = "${genesis.nonInteractive}", property = "nonInteractive")
     private boolean nonInteractive;
+    @Parameter(defaultValue = "${genesis.headless}", property = "headless")
+    private boolean headless;
+    @Parameter(defaultValue = "${genesis.skip}", property = "skip")
+    private boolean skip;
+    @Parameter(defaultValue = "${genesis.abort}", property = "abort")
+    private String abort;
 
     public String getTemplate() {
         return template;
@@ -54,16 +63,62 @@ public class TemplateMojo extends AbstractMojo {
         this.vars = vars;
     }
 
+    public boolean isNonInteractive() {
+        return nonInteractive;
+    }
+
+    public void setNonInteractive(boolean nonInteractive) {
+        this.nonInteractive = nonInteractive;
+    }
+
+    public boolean isSkip() {
+        return skip;
+    }
+
+    public void setSkip(boolean skip) {
+        this.skip = skip;
+    }
+
     public void execute() throws MojoExecutionException {
-        try {
-            Template t = Template.create(template);
-            if( vars != null ) {
-                t.addVariables(vars);
+        if (!skip) {
+            boolean disableHeadless = !headless && GraphicsEnvironment.isHeadless();
+            try {
+                if (disableHeadless) {
+                    // !@#$@!#$!@#%$&!@#($&!@# anypoint / eclipse running maven headless
+                    // brute forcing it back to system
+                    try {
+                        Field toolkit = Toolkit.class.getDeclaredField("toolkit");
+                        toolkit.setAccessible(true);
+                        toolkit.set(null, null);
+                        Field headless = GraphicsEnvironment.class.getDeclaredField("headless");
+                        headless.setAccessible(true);
+                        headless.set(null, false);
+                    } catch (Throwable e) {
+                        getLog().error("Unable to get out of headless mode :(... template execution will probably fail if user input is required");
+                    }
+                }
+                getLog().debug("Loading genesis template");
+                Template t = Template.create(template);
+                getLog().info("Executing genesis template");
+                if (vars != null) {
+                    t.setVariables(vars);
+                }
+                if (defaults != null) {
+                    t.setDefaults(defaults);
+                }
+                t.setHeadless(this.headless);
+                t.setNonInteractive(nonInteractive);
+                t.generate(target);
+                getLog().info("Finished generate template project");
+                if (StringUtils.isNotBlank(abort)) {
+                    throw new MojoExecutionException(abort);
+                }
+            } catch (TemplateNotFoundException | InvalidTemplateException | IOException | TemplateExecutionException e) {
+                getLog().error(e);
+                throw new MojoExecutionException(e.getMessage(), e);
             }
-            t.setNonInteractive(nonInteractive);
-            t.generate(target);
-        } catch (TemplateNotFoundException|InvalidTemplateException|IOException|TemplateExecutionException e) {
-            throw new MojoExecutionException(e.getMessage(),e);
+        } else {
+            getLog().info("Skipping genesis template");
         }
     }
 }

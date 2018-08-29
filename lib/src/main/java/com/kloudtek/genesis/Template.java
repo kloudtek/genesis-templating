@@ -18,22 +18,15 @@ import java.util.Map;
 @XmlRootElement
 public class Template {
     private static final Logger logger = LoggerFactory.getLogger(Template.class);
-    @XmlElement(name = "question")
-    @XmlElementWrapper
-    private List<Question> questions;
-    @XmlElementWrapper(name = "files")
-    @XmlElements({
-            @XmlElement(name = "file", type = TFile.class),
-            @XmlElement(name = "dir", type = Directory.class)
-    })
+    private List<Input> steps;
     private List<FSObj> files;
     private boolean overwrite;
-    @XmlTransient
-    private Map<String, String> variables = new HashMap<>();
+    private final Map<String, String> variables = new HashMap<>();
+    private final Map<String, String> defaults = new HashMap<>();
     @XmlTransient
     private final Configuration fmCfg;
-    @XmlTransient
     private boolean nonInteractive;
+    private boolean isHeadless;
 
     public Template() {
         fmCfg = new Configuration(Configuration.VERSION_2_3_28);
@@ -42,6 +35,16 @@ public class Template {
         fmCfg.setWrapUncheckedExceptions(true);
     }
 
+    @XmlTransient
+    public boolean isHeadless() {
+        return isHeadless;
+    }
+
+    public void setHeadless(boolean headless) {
+        isHeadless = headless;
+    }
+
+    @XmlTransient
     public boolean isNonInteractive() {
         return nonInteractive;
     }
@@ -62,7 +65,7 @@ public class Template {
             fmCfg.getTemplate("template").process(variables, buf);
             return buf.toString();
         } catch (TemplateException | IOException e) {
-            throw new TemplateExecutionException(e);
+            throw new TemplateExecutionException("An error occured while processing template: " + text, e);
         }
     }
 
@@ -98,9 +101,9 @@ public class Template {
     }
 
     public void generate(File target) throws TemplateExecutionException {
-        if (questions != null) {
-            for (Question question : questions) {
-                question.setTemplate(this);
+        if (steps != null) {
+            for (Input input : steps) {
+                input.setTemplate(this);
             }
         }
         if (files != null) {
@@ -116,9 +119,9 @@ public class Template {
         } else if (!target.isDirectory()) {
             throw new TemplateExecutionException("Target is not a directory " + target);
         }
-        if (questions != null) {
-            for (Question question : questions) {
-                question.ask();
+        if (steps != null) {
+            for (Input input : steps) {
+                input.ask();
             }
         }
         if (files != null) {
@@ -143,8 +146,58 @@ public class Template {
         return false;
     }
 
+    @XmlElementWrapper(name = "steps")
+    @XmlElements({
+            @XmlElement(name = "input", type = Input.class),
+    })
+    public List<Input> getSteps() {
+        return steps;
+    }
+
+    public void setSteps(List<Input> steps) {
+        this.steps = steps;
+    }
+
+    @XmlElementWrapper(name = "files")
+    @XmlElements({
+            @XmlElement(name = "file", type = TFile.class),
+            @XmlElement(name = "dir", type = Directory.class)
+    })
+    public List<FSObj> getFiles() {
+        return files;
+    }
+
+    public void setFiles(List<FSObj> files) {
+        this.files = files;
+    }
+
+    @XmlTransient
     public Map<String, String> getVariables() {
         return variables;
+    }
+
+    public void setVariables(Map<String, String> variables) {
+        this.variables.clear();
+        addVariables(variables);
+    }
+
+    public String getDefaultValue(String key) {
+        return defaults.get(key);
+
+    }
+
+    @XmlTransient
+    public Map<String, String> getDefaults() {
+        return defaults;
+    }
+
+    public void setDefaults(Map<String, String> defaults) {
+        this.defaults.clear();
+        addDefault(defaults);
+    }
+
+    public void addDefault(Map<String, String> defaults) {
+        this.defaults.putAll(defaults);
     }
 
     public void setVariable(String id, String val) {
@@ -164,6 +217,6 @@ public class Template {
     }
 
     public boolean containsVariable(String id) {
-        return variables != null && variables.containsKey(id);
+        return variables.containsKey(id);
     }
 }
