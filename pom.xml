@@ -8,6 +8,7 @@
     <artifactId>genesis-templating</artifactId>
     <packaging>pom</packaging>
     <version>1.0-SNAPSHOT</version>
+    <name>Genesis Templating</name>
     <description>Advanced project template technology</description>
     <url>https://github.com/kloudtek/genesis-templating</url>
 
@@ -124,11 +125,6 @@
     </repositories>
 
     <distributionManagement>
-        <site>
-            <name>S3 Site</name>
-            <id>kloudtek-s3-docs</id>
-            <url>s3://docs.kloudtek.com/anypoint-tools</url>
-        </site>
         <repository>
             <id>ossrh</id>
             <url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
