@@ -20,7 +20,7 @@ import java.util.Map;
 /**
  * Goal which touches a timestamp file.
  */
-@Mojo( name = "template", defaultPhase = LifecyclePhase.INITIALIZE )
+@Mojo(name = "template", defaultPhase = LifecyclePhase.INITIALIZE, requiresProject = false)
 public class TemplateMojo extends AbstractMojo {
     @Parameter(defaultValue = "${genesis.template}", property = "template", required = true)
     private String template;
