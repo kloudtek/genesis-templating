@@ -17,7 +17,7 @@ public abstract class FSObj {
     @XmlTransient
     protected Template template;
 
-    public abstract void create(File target) throws TemplateExecutionException;
+    public abstract void create(TemplateExecutor exec, File target) throws TemplateExecutionException;
 
     public void setTemplate(Template template) {
         this.template = template;
@@ -27,9 +27,9 @@ public abstract class FSObj {
         return file.exists();
     }
 
-    public void process(File target) throws TemplateExecutionException {
-        path = template.filter(path);
+    public void process(TemplateExecutor exec, File target) throws TemplateExecutionException {
+        path = exec.filter(path);
         file = new File(target + File.separator + path);
-        ignore = template.filter(ignore);
+        ignore = exec.filter(ignore);
     }
 }

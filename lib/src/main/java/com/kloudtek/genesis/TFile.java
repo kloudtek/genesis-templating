@@ -17,13 +17,13 @@ public class TFile extends FSObj {
     @XmlAttribute
     private String resource;
 
-    public void create(File target) throws TemplateExecutionException {
+    public void create(TemplateExecutor exec, File target) throws TemplateExecutionException {
         try {
             File parent = file.getParentFile();
             if (!parent.exists()) {
                 FileUtils.mkdirs(parent);
             }
-            try (FileOutputStream os = new FileOutputStream(file); InputStream is = getContent()) {
+            try (FileOutputStream os = new FileOutputStream(file); InputStream is = getContent(exec)) {
                 IOUtils.copy(is, os);
             }
         } catch (IOException e) {
@@ -31,13 +31,13 @@ public class TFile extends FSObj {
         }
     }
 
-    private InputStream getContent() throws TemplateExecutionException {
+    private InputStream getContent(TemplateExecutor exec) throws TemplateExecutionException {
         try {
             if (StringUtils.isNotBlank(resource)) {
                 if (!resource.startsWith("/")) {
                     resource = "/" + resource;
                 }
-                resource = template.filter(resource);
+                resource = exec.filter(resource);
                 try (InputStream is = getClass().getResourceAsStream(resource)) {
                     if (process == null || process) {
                         content = IOUtils.toString(is, getEncoding());
@@ -53,7 +53,7 @@ public class TFile extends FSObj {
                 content = content.trim();
             }
             if (process == null || process) {
-                return new ByteArrayInputStream(template.filter(content).getBytes(getEncoding()));
+                return new ByteArrayInputStream(exec.filter(content).getBytes(getEncoding()));
             } else {
                 return new ByteArrayInputStream(content.getBytes(getEncoding()));
             }

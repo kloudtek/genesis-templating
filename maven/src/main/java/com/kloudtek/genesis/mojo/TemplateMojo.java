@@ -98,7 +98,7 @@ public class TemplateMojo extends AbstractMojo {
                     }
                 }
                 getLog().debug("Loading genesis template");
-                Template t = Template.create(template);
+                Template t = executeTemplate();
                 getLog().info("Executing genesis template");
                 if (vars != null) {
                     t.setVariables(vars);
@@ -120,5 +120,9 @@ public class TemplateMojo extends AbstractMojo {
         } else {
             getLog().info("Skipping genesis template");
         }
+    }
+
+    private Template executeTemplate() throws TemplateNotFoundException, InvalidTemplateException, IOException {
+        return Template.create(template);
     }
 }

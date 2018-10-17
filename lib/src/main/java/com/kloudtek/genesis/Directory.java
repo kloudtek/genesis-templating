@@ -16,7 +16,7 @@ public class Directory extends FSObj {
     private List<FSObj> files;
 
     @Override
-    public void create(File target) throws TemplateExecutionException {
+    public void create(TemplateExecutor exec, File target) throws TemplateExecutionException {
         if( ignore != null ) {
             if( ignore.equalsIgnoreCase("true") ) {
                 return;
@@ -33,18 +33,18 @@ public class Directory extends FSObj {
         }
         if( files != null ) {
             for (FSObj f : files) {
-                f.create(file);
+                f.create(exec, file);
             }
         }
     }
 
 
     @Override
-    public void process(File target) throws TemplateExecutionException {
-        super.process(target);
+    public void process(TemplateExecutor exec, File target) throws TemplateExecutionException {
+        super.process(exec, target);
         if( files != null ) {
             for (FSObj f : files) {
-                f.process(file);
+                f.process(exec, file);
             }
         }
     }

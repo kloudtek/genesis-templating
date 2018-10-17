@@ -10,9 +10,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Input {
-    @XmlAttribute
+    @XmlAttribute(required = true)
     private String id;
-    @XmlAttribute
+    @XmlAttribute(required = true)
     private String message;
     @XmlAttribute(name = "default")
     private String defaultValue;
@@ -20,25 +20,26 @@ public class Input {
     private boolean blankAllowed;
     @XmlElement(name = "option")
     private List<InputOption> options;
-    private Template template;
+    @XmlAttribute
+    private boolean advanced;
 
-    public void ask() throws TemplateExecutionException {
-        if (!template.containsVariable(id)) {
+    public void ask(TemplateExecutor exec) throws TemplateExecutionException {
+        if (!exec.containsVariable(id)) {
             String val = null;
-            String df = template.filter(defaultValue);
-            String dfOverride = template.getDefaultValue(id);
+            String df = exec.filter(defaultValue);
+            String dfOverride = exec.getDefaultValue(id);
             if (StringUtils.isNotBlank(dfOverride)) {
                 df = dfOverride;
             }
-            if (template.isNonInteractive()) {
+            if (exec.isNonInteractive() || ( df != null && !advanced )) {
                 if (df != null) {
                     val = df;
                 } else {
-                    throw new TemplateExecutionException("Variable " + id + " must be set since (nonInteractive mode activated)");
+                    throw new VariableMissingException("Variable " + id + " is missing",this);
                 }
             } else {
                 while (val == null) {
-                    if (template.isHeadless()) {
+                    if (exec.isHeadless()) {
                         val = ConsoleUtils.read(message, df);
                     } else {
                         // @#$@#$@#$#@ some kind of bug breaking icon on mac os, so forcing my own icon (sigh)
@@ -75,11 +76,29 @@ public class Input {
                     }
                 }
             }
-            template.setVariable(id, val);
+            if( ! checkValid(val) ) {
+                throw new InvalidVariableException("Invalid variable "+id+" value: "+val);
+            } else {
+                exec.setVariable(id, val);
+            }
+        } else {
+            String value = exec.getVariable(id);
+            if( ! checkValid(value) ) {
+                throw new InvalidVariableException("Invalid variable "+id+" value: "+value);
+            }
         }
     }
 
-    public void setTemplate(Template template) {
-        this.template = template;
+    private boolean checkValid(String val) {
+        if( options != null && ! options.isEmpty() ) {
+            for (InputOption option : options) {
+                if( option.getId().equalsIgnoreCase(val) ) {
+                    return true;
+                }
+            }
+            return false;
+        } else {
+            return true;
+        }
     }
 }
