@@ -1,9 +1,6 @@
 package com.kloudtek.genesis.mojo;
 
-import com.kloudtek.genesis.InvalidTemplateException;
-import com.kloudtek.genesis.Template;
-import com.kloudtek.genesis.TemplateExecutionException;
-import com.kloudtek.genesis.TemplateNotFoundException;
+import com.kloudtek.genesis.*;
 import com.kloudtek.util.StringUtils;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -100,15 +97,16 @@ public class TemplateMojo extends AbstractMojo {
                 getLog().debug("Loading genesis template");
                 Template t = executeTemplate();
                 getLog().info("Executing genesis template");
+                TemplateExecutor exec = new TemplateExecutor(template, target);
                 if (vars != null) {
-                    t.setVariables(vars);
+                    exec.setVariables(vars);
                 }
                 if (defaults != null) {
-                    t.setDefaults(defaults);
+                    exec.setDefaults(defaults);
                 }
-                t.setHeadless(this.headless);
-                t.setNonInteractive(nonInteractive);
-                t.generate(target);
+                exec.setHeadless(this.headless);
+                exec.setNonInteractive(nonInteractive);
+                exec.execute();
                 getLog().info("Finished generate template project");
                 if (StringUtils.isNotBlank(abort)) {
                     throw new MojoExecutionException(abort);
