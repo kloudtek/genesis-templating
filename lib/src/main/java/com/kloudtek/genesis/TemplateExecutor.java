@@ -25,6 +25,7 @@ public class TemplateExecutor {
     private boolean nonInteractive;
     private boolean isHeadless;
     private boolean advanced;
+    private boolean dryRun;
 
     public TemplateExecutor(Template template, File target) {
         this.template = template;
@@ -51,7 +52,18 @@ public class TemplateExecutor {
         }
     }
 
-    public void execute() throws TemplateExecutionException {
+    public synchronized List<Input> executeDryRun() {
+        steps = template.getInputs();
+        dryRun = true;
+        try {
+
+        } finally {
+            dryRun = false;
+        }
+        return null;
+    }
+
+    public synchronized void execute() throws TemplateExecutionException {
         steps = template.getInputs();
         files = template.getFiles();
         logger.info("Generating template to " + target);
@@ -79,6 +91,8 @@ public class TemplateExecutor {
             }
         }
     }
+
+
 
     private boolean checkConflicts() throws TemplateExecutionException {
         for (FSObj file : files) {
@@ -156,4 +170,11 @@ public class TemplateExecutor {
         this.advanced = advanced;
     }
 
+    public boolean isDryRun() {
+        return dryRun;
+    }
+
+    public void setDryRun(boolean dryRun) {
+        this.dryRun = dryRun;
+    }
 }
