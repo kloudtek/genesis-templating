@@ -97,7 +97,9 @@ public class TemplateMojo extends AbstractMojo {
                 getLog().debug("Loading genesis template");
                 Template t = executeTemplate();
                 getLog().info("Executing genesis template");
-                TemplateExecutor exec = new TemplateExecutor(template, target);
+                TemplatesManager templatesManager = new TemplatesManager();
+                Template template = templatesManager.getTemplate(this.template);
+                TemplateExecutor exec = new TemplateExecutor(template);
                 if (vars != null) {
                     exec.setVariables(vars);
                 }
@@ -106,7 +108,7 @@ public class TemplateMojo extends AbstractMojo {
                 }
                 exec.setHeadless(this.headless);
                 exec.setNonInteractive(nonInteractive);
-                exec.execute();
+                exec.execute(target);
                 getLog().info("Finished generate template project");
                 if (StringUtils.isNotBlank(abort)) {
                     throw new MojoExecutionException(abort);

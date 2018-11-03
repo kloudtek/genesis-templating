@@ -47,33 +47,33 @@ public class TemplatesManagerTest {
     public void testValWithTwoInputs() throws Exception {
         TemplateExecutor executor = createExecutor("testOneFileWithTwoInputs");
         try {
-            executor.execute();
+            executor.execute(tmpDir);
             fail("didn't throw VariableMissingException");
         } catch (VariableMissingException e) {
             assertTrue(e.getMessage().contains("i1"));
         }
         try {
             executor.setVariable("i1","foo");
-            executor.execute();
+            executor.execute(tmpDir);
             fail("didn't throw VariableMissingException");
         } catch (VariableMissingException e) {
             assertTrue(e.getMessage().contains("i2"));
         }
         executor.setVariable("i2","bar");
-        executor.execute();
+        executor.execute(tmpDir);
         assertOneFile("# foo - bar");
     }
 
     @Test(expected = TemplateExecutionException.class)
     public void testVarNotSet() throws Exception {
         TemplateExecutor executor = createExecutor(TEST_ONE_FILE);
-        executor.execute();
+        executor.execute(tmpDir);
     }
 
     @Test(expected = VariableMissingException.class)
     public void testWithInputVarNotSet() throws Exception {
         TemplateExecutor executor = createExecutor(TEST_ONE_FILE_WITH_INPUT);
-        executor.execute();
+        executor.execute(tmpDir);
     }
 
     @Test
@@ -95,12 +95,12 @@ public class TemplatesManagerTest {
     private TemplateExecutor executeWithVar(String testWithOptions, String myval, String foo) throws TemplateNotFoundException, TemplateExecutionException {
         TemplateExecutor executor = createExecutor(testWithOptions);
         executor.setVariable(myval, foo);
-        executor.execute();
+        executor.execute(tmpDir);
         return executor;
     }
 
     private TemplateExecutor createExecutor(String templateName) throws TemplateNotFoundException {
-        TemplateExecutor executor = templatesManager.createExecutor(templateName, tmpDir);
+        TemplateExecutor executor = templatesManager.createExecutor(templateName);
         executor.setNonInteractive(true);
         return executor;
     }

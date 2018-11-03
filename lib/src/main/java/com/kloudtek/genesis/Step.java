@@ -1,4 +1,4 @@
 package com.kloudtek.genesis;
 
-public class Step {
+public interface Step {
 }

@@ -14,7 +14,7 @@ public class Template {
     private static final Logger logger = LoggerFactory.getLogger(Template.class);
     private String id;
     private String name;
-    private List<Input> inputs;
+    private List<Input> steps;
     private List<FSObj> files;
     private boolean overwrite;
 
@@ -70,16 +70,16 @@ public class Template {
         return is;
     }
 
-    @XmlElementWrapper(name = "inputs")
+    @XmlElementWrapper(name = "steps")
     @XmlElements({
             @XmlElement(name = "input", type = Input.class),
     })
-    public List<Input> getInputs() {
-        return inputs;
+    public List<Input> getSteps() {
+        return steps;
     }
 
-    public void setInputs(List<Input> inputs) {
-        this.inputs = inputs;
+    public void setSteps(List<Input> steps) {
+        this.steps = steps;
     }
 
     @XmlElementWrapper(name = "files")

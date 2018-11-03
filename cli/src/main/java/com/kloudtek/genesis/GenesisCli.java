@@ -26,10 +26,10 @@ public class GenesisCli implements Callable<Void> {
     public Void call() throws Exception {
         logger.info("Creating template using "+templatePath);
         Template template = Template.create(this.templatePath);
-        if( vars != null ) {
-            template.addVariables(vars);
-        }
-        template.generate(target);
+//        if( vars != null ) {
+//            template.addVariables(vars);
+//        }
+//        template.generate(target);
         return null;
     }
 }

@@ -2,13 +2,15 @@ package com.kloudtek.genesis;
 
 import com.kloudtek.util.ConsoleUtils;
 import com.kloudtek.util.StringUtils;
+import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class Input extends Question {
+public class Input extends Question implements Step {
+    @NotNull
     public List<Question> getQuestions(TemplateExecutor exec) {
         return Collections.singletonList(this);
     }

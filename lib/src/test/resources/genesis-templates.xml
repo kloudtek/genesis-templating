@@ -7,9 +7,9 @@
         </files>
     </template>
     <template name="testOneFileWithInput">
-        <inputs>
+        <steps>
             <input id="testval" message="doStuff"/>
-        </inputs>
+        </steps>
         <files>
             <file path="README.md">
                 # ${testval}
@@ -17,10 +17,10 @@
         </files>
     </template>
     <template name="testOneFileWithTwoInputs">
-        <inputs>
+        <steps>
             <input id="i1" message="foo"/>
             <input id="i2" message="bar"/>
-        </inputs>
+        </steps>
         <files>
             <file path="README.md">
                 # ${i1} - ${i2}
@@ -28,12 +28,12 @@
         </files>
     </template>
     <template name="testWithOptions">
-        <inputs>
+        <steps>
             <input id="myval" message="select myval">
                 <option id="foo" text="foox"/>
                 <option id="bar" text="barx"/>
             </input>
-        </inputs>
+        </steps>
         <files>
             <file path="README.md">
                 # ${myval}
@@ -41,14 +41,14 @@
         </files>
     </template>
     <template name="testWithConditionalValueBasedOnOption">
-        <inputs>
+        <steps>
             <input id="myval" message="select myval">
                 <option id="foo" text="foox">
                     <input id="otherval" message="otherval"/>
                 </option>
                 <option id="bar" text="barx"/>
             </input>
-        </inputs>
+        </steps>
         <files>
             <file path="README.md">
                 # ${myval}

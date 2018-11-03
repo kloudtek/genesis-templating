@@ -1,6 +1,7 @@
 package com.kloudtek.genesis;
 
 import com.kloudtek.util.xml.XmlUtils;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,11 +40,19 @@ public class TemplatesManager {
         }
     }
 
-    public TemplateExecutor createExecutor(String templateName, File target) throws TemplateNotFoundException {
+
+
+    public TemplateExecutor createExecutor(String templateName) throws TemplateNotFoundException {
+        Template template = getTemplate(templateName);
+        return new TemplateExecutor(template);
+    }
+
+    @NotNull
+    public Template getTemplate(String templateName) throws TemplateNotFoundException {
         Template template = templates.get(templateName);
         if( template == null ) {
             throw new TemplateNotFoundException("Unable to find template "+templateName);
         }
-        return new TemplateExecutor(template,target);
+        return template;
     }
 }

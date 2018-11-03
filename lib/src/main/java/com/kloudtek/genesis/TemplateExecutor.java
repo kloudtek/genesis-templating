@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,7 +18,6 @@ public class TemplateExecutor {
     private static final Logger logger = LoggerFactory.getLogger(TemplateExecutor.class);
     private final Configuration fmCfg;
     private Template template;
-    private File target;
     private List<Input> steps;
     private List<FSObj> files;
     private final Map<String, String> variables = new HashMap<>();
@@ -25,11 +25,9 @@ public class TemplateExecutor {
     private boolean nonInteractive;
     private boolean isHeadless;
     private boolean advanced;
-    private boolean dryRun;
 
-    public TemplateExecutor(Template template, File target) {
+    public TemplateExecutor(Template template) {
         this.template = template;
-        this.target = target;
         fmCfg = new Configuration(Configuration.VERSION_2_3_28);
         fmCfg.setDefaultEncoding("UTF-8");
         fmCfg.setLogTemplateExceptions(false);
@@ -52,19 +50,8 @@ public class TemplateExecutor {
         }
     }
 
-    public synchronized List<Input> executeDryRun() {
-        steps = template.getInputs();
-        dryRun = true;
-        try {
-
-        } finally {
-            dryRun = false;
-        }
-        return null;
-    }
-
-    public synchronized void execute() throws TemplateExecutionException {
-        steps = template.getInputs();
+    public synchronized void execute(File target) throws TemplateExecutionException {
+        steps = template.getSteps();
         files = template.getFiles();
         logger.info("Generating template to " + target);
         if (!target.exists()) {
@@ -170,11 +157,21 @@ public class TemplateExecutor {
         this.advanced = advanced;
     }
 
-    public boolean isDryRun() {
-        return dryRun;
-    }
-
-    public void setDryRun(boolean dryRun) {
-        this.dryRun = dryRun;
+    public List<Question> getQuestions() {
+        ArrayList<Question> questions = new ArrayList<>();
+        if( template.getSteps() != null ) {
+            for (Step step : template.getSteps()) {
+                if( step instanceof Input ) {
+                    questions.addAll(((Input) step).getQuestions(this));
+                }
+            }
+        }
+        for (Question question : questions) {
+            String var = variables.get(question.getId());
+            if( var != null ) {
+                question.setDefaultValue(var);
+            }
+        }
+        return questions;
     }
 }
