@@ -6,6 +6,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
+import java.util.ArrayList;
 import java.util.List;
 
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -34,6 +35,22 @@ public class Question {
     @XmlAttribute
     @JsonProperty
     protected Type type;
+
+    public Question() {
+    }
+
+    public Question(Question question) {
+        id = question.id;
+        name = question.name;
+        description = question.description;
+        defaultValue = question.defaultValue;
+        blankAllowed = question.blankAllowed;
+        if( question.getOptions() != null ) {
+            options = new ArrayList<>(question.getOptions());
+        }
+        advanced = question.advanced;
+        type = question.type;
+    }
 
     public String getId() {
         return id;

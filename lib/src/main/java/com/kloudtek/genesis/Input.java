@@ -12,7 +12,7 @@ import java.util.List;
 public class Input extends Question implements Step {
     @NotNull
     public List<Question> getQuestions(TemplateExecutor exec) {
-        return Collections.singletonList(this);
+        return Collections.singletonList(new Question(this));
     }
 
     public void ask(TemplateExecutor exec) throws TemplateExecutionException {
