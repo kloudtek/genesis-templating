@@ -14,6 +14,7 @@ public class Template {
     private static final Logger logger = LoggerFactory.getLogger(Template.class);
     private String id;
     private String name;
+    private String resourcePath;
     private List<Input> steps;
     private List<FSObj> files;
     private boolean overwrite;
@@ -37,6 +38,15 @@ public class Template {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    @XmlAttribute
+    public String getResourcePath() {
+        return resourcePath;
+    }
+
+    public void setResourcePath(String resourcePath) {
+        this.resourcePath = resourcePath;
     }
 
     public static Template create(String path) throws TemplateNotFoundException, InvalidTemplateException, IOException {
@@ -101,5 +111,11 @@ public class Template {
 
     public void setOverwrite(boolean overwrite) {
         this.overwrite = overwrite;
+    }
+
+    public void afterUnmarshal(Unmarshaller unmarshaller, Object parent) {
+        for (FSObj file : files) {
+            file.setTemplate(this);
+        }
     }
 }

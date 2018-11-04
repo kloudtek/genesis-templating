@@ -2,6 +2,7 @@ package com.kloudtek.genesis;
 
 import com.kloudtek.util.FileUtils;
 import com.kloudtek.util.StringUtils;
+import com.kloudtek.util.URLBuilder;
 import com.kloudtek.util.io.IOUtils;
 
 import javax.xml.bind.annotation.XmlAttribute;
@@ -34,11 +35,12 @@ public class TFile extends FSObj {
     private InputStream getContent(TemplateExecutor exec) throws TemplateExecutionException {
         try {
             if (StringUtils.isNotBlank(resource)) {
-                if (!resource.startsWith("/")) {
-                    resource = "/" + resource;
+                URLBuilder urlBuilder = new URLBuilder("/");
+                if( template.getResourcePath() != null ) {
+                    urlBuilder.path(template.getResourcePath());
                 }
-                resource = exec.filter(resource);
-                try (InputStream is = getClass().getResourceAsStream(resource)) {
+                urlBuilder.path(exec.filter(resource));
+                try (InputStream is = getClass().getResourceAsStream(urlBuilder.toString())) {
                     if (process == null || process) {
                         content = IOUtils.toString(is, getEncoding());
                     } else {
