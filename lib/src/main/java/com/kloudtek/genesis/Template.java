@@ -1,5 +1,7 @@
 package com.kloudtek.genesis;
 
+import com.kloudtek.genesis.step.ConditionalSteps;
+import com.kloudtek.genesis.step.Input;
 import com.kloudtek.util.xml.XmlUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -83,6 +85,7 @@ public class Template {
     @XmlElementWrapper(name = "steps")
     @XmlElements({
             @XmlElement(name = "input", type = Input.class),
+            @XmlElement(name = "conditional", type = ConditionalSteps.class)
     })
     public List<Input> getSteps() {
         return steps;

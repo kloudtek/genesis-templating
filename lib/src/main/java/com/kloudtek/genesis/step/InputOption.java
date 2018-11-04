@@ -1,4 +1,4 @@
-package com.kloudtek.genesis;
+package com.kloudtek.genesis.step;
 
 import javax.xml.bind.annotation.XmlAttribute;
 

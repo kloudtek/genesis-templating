@@ -104,7 +104,7 @@ public class TemplateMojo extends AbstractMojo {
                     exec.setVariables(vars);
                 }
                 if (defaults != null) {
-                    exec.setDefaults(defaults);
+                    exec.setDefaultOverrides(defaults);
                 }
                 exec.setHeadless(this.headless);
                 exec.setNonInteractive(nonInteractive);

@@ -99,7 +99,7 @@ public class TemplatesManagerTest {
         return executor;
     }
 
-    private TemplateExecutor createExecutor(String templateName) throws TemplateNotFoundException {
+    private TemplateExecutor createExecutor(String templateName) throws TemplateNotFoundException, TemplateExecutionException {
         TemplateExecutor executor = templatesManager.createExecutor(templateName);
         executor.setNonInteractive(true);
         return executor;

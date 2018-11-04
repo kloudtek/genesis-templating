@@ -1,11 +1,8 @@
-package com.kloudtek.genesis;
+package com.kloudtek.genesis.step;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,9 +31,20 @@ public class Question {
     protected boolean advanced;
     @XmlAttribute
     @JsonProperty
-    protected Type type;
+    protected Type type = Type.STRING;
 
     public Question() {
+    }
+
+    public Question(String id, String name, String description, String defaultValue, boolean blankAllowed, List<InputOption> options, boolean advanced, Type type) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.defaultValue = defaultValue;
+        this.blankAllowed = blankAllowed;
+        this.options = options;
+        this.advanced = advanced;
+        this.type = type;
     }
 
     public Question(Question question) {
@@ -116,6 +124,8 @@ public class Question {
         this.type = type;
     }
 
+    @XmlType(name = "QuestionType")
+    @XmlEnum
     public enum Type {
         STRING, NUMBER, BOOLEAN
     }

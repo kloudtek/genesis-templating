@@ -7,7 +7,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
-import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Enumeration;
@@ -20,7 +19,7 @@ public class TemplatesManager {
 
     public TemplatesManager() throws IOException, InvalidTemplateException {
         Enumeration<URL> resources = getClass().getClassLoader().getResources("genesis-templates.xml");
-        if( !resources.hasMoreElements() ) {
+        if (!resources.hasMoreElements()) {
             logger.warn("No template descriptors found");
         }
         while (resources.hasMoreElements()) {
@@ -34,8 +33,8 @@ public class TemplatesManager {
                     if (templates.containsKey(templateName)) {
                         throw new InvalidTemplateException("Found duplicate templates: " + url + " and " + templates.get(templateName));
                     }
-                    templates.put(templateName,template);
-                    templatesUrl.put(templateName,url);
+                    templates.put(templateName, template);
+                    templatesUrl.put(templateName, url);
                     logger.debug("Loaded template " + templateName);
                 }
             } catch (JAXBException e) {
@@ -45,8 +44,7 @@ public class TemplatesManager {
     }
 
 
-
-    public TemplateExecutor createExecutor(String templateName) throws TemplateNotFoundException {
+    public TemplateExecutor createExecutor(String templateName) throws TemplateNotFoundException, TemplateExecutionException {
         Template template = getTemplate(templateName);
         return new TemplateExecutor(template);
     }
@@ -54,8 +52,8 @@ public class TemplatesManager {
     @NotNull
     public Template getTemplate(String templateName) throws TemplateNotFoundException {
         Template template = templates.get(templateName);
-        if( template == null ) {
-            throw new TemplateNotFoundException("Unable to find template "+templateName);
+        if (template == null) {
+            throw new TemplateNotFoundException("Unable to find template " + templateName);
         }
         return template;
     }

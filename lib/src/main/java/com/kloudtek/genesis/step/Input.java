@@ -1,21 +1,57 @@
-package com.kloudtek.genesis;
+package com.kloudtek.genesis.step;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.kloudtek.genesis.InvalidVariableException;
+import com.kloudtek.genesis.TemplateExecutionException;
+import com.kloudtek.genesis.TemplateExecutor;
+import com.kloudtek.genesis.VariableMissingException;
 import com.kloudtek.util.ConsoleUtils;
 import com.kloudtek.util.StringUtils;
-import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class Input extends Question implements Step {
-    @NotNull
-    public List<Question> getQuestions(TemplateExecutor exec) {
-        return Collections.singletonList(new Question(this));
+@XmlAccessorType(XmlAccessType.FIELD)
+public class Input extends Step {
+    @XmlAttribute(required = true)
+    @JsonProperty(required = true)
+    protected String id;
+    @XmlAttribute(required = true)
+    @JsonProperty(required = true)
+    protected String name;
+    @XmlAttribute()
+    @JsonProperty()
+    protected String description;
+    @XmlAttribute(name = "default")
+    @JsonProperty("default")
+    protected String defaultValue;
+    @XmlAttribute
+    @JsonProperty
+    protected boolean blankAllowed;
+    @XmlElement(name = "option")
+    @JsonProperty
+    protected List<InputOption> options;
+    @XmlAttribute
+    @JsonProperty
+    protected boolean advanced;
+    @XmlAttribute
+    @JsonProperty
+    protected Question.Type type = Question.Type.STRING;
+
+    @Override
+    public List<Question> getQuestions(TemplateExecutor exec) throws TemplateExecutionException {
+        updateDefaults(exec);
+        return Collections.singletonList(new Question(id, exec.filter(name), exec.filter(description), exec.filter(defaultValue), blankAllowed, options, advanced, type));
     }
 
     public void ask(TemplateExecutor exec) throws TemplateExecutionException {
+        updateDefaults(exec);
         if (!exec.containsVariable(id)) {
             String val = null;
             String df = exec.filter(defaultValue);
@@ -78,6 +114,12 @@ public class Input extends Question implements Step {
             if (!checkValid(value)) {
                 throw new InvalidVariableException("Invalid variable " + id + " value: " + value);
             }
+        }
+    }
+
+    private void updateDefaults(TemplateExecutor exec) throws TemplateExecutionException {
+        if( defaultValue != null && exec.resolveVariable(id) == null ) {
+            exec.getDefaults().put(id,exec.filter(defaultValue));
         }
     }
 

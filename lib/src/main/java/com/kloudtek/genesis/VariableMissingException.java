@@ -1,5 +1,7 @@
 package com.kloudtek.genesis;
 
+import com.kloudtek.genesis.step.Input;
+
 public class VariableMissingException extends TemplateExecutionException {
     private Input input;
 
