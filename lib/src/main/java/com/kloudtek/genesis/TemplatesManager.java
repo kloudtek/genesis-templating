@@ -19,7 +19,10 @@ public class TemplatesManager {
     private HashMap<String, URL> templatesUrl = new HashMap<>();
 
     public TemplatesManager() throws IOException, InvalidTemplateException {
-        Enumeration<URL> resources = ClassLoader.getSystemClassLoader().getResources("genesis-templates.xml");
+        Enumeration<URL> resources = getClass().getClassLoader().getResources("genesis-templates.xml");
+        if( !resources.hasMoreElements() ) {
+            logger.warn("No template descriptors found");
+        }
         while (resources.hasMoreElements()) {
             URL url = resources.nextElement();
             logger.debug("Found template file " + url.toString());
@@ -33,6 +36,7 @@ public class TemplatesManager {
                     }
                     templates.put(templateName,template);
                     templatesUrl.put(templateName,url);
+                    logger.debug("Loaded template " + templateName);
                 }
             } catch (JAXBException e) {
                 throw new InvalidTemplateException("Invalid genesis template file: " + url + ": " + e.getMessage(), e);
