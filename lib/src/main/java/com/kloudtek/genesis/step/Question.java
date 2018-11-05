@@ -31,12 +31,16 @@ public class Question {
     protected boolean advanced;
     @XmlAttribute
     @JsonProperty
+    protected boolean refresh;
+    @XmlAttribute
+    @JsonProperty
     protected Type type = Type.STRING;
 
     public Question() {
     }
 
-    public Question(String id, String name, String description, String defaultValue, boolean blankAllowed, List<InputOption> options, boolean advanced, Type type) {
+    public Question(String id, String name, String description, String defaultValue, boolean blankAllowed,
+                    List<InputOption> options, boolean advanced, Type type, boolean refresh) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -45,6 +49,7 @@ public class Question {
         this.options = options;
         this.advanced = advanced;
         this.type = type;
+        this.refresh = refresh;
     }
 
     public Question(Question question) {
@@ -122,6 +127,14 @@ public class Question {
 
     public void setType(Type type) {
         this.type = type;
+    }
+
+    public boolean isRefresh() {
+        return refresh;
+    }
+
+    public void setRefresh(boolean refresh) {
+        this.refresh = refresh;
     }
 
     @XmlType(name = "QuestionType")

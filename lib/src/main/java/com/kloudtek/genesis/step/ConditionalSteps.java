@@ -15,12 +15,16 @@ public class ConditionalSteps extends Step {
     private String condition;
     private String value;
 
-    @Override
-    public List<Question> getQuestions(TemplateExecutor exec) throws TemplateExecutionException {
+    public boolean isActive(TemplateExecutor exec) throws TemplateExecutionException {
         String varId = exec.filter(condition);
         String match = value != null ? exec.filter(value) : null;
         String resolvedValue = exec.resolveVariable(varId);
-        if (match != null ? resolvedValue.equals(match) : Boolean.parseBoolean(resolvedValue)) {
+        return match != null ? resolvedValue.equals(match) : Boolean.parseBoolean(resolvedValue);
+    }
+
+    @Override
+    public List<Question> getQuestions(TemplateExecutor exec) throws TemplateExecutionException {
+        if (isActive(exec)) {
             List<Question> results = new ArrayList<>();
             if( steps != null ) {
                 for (Step step : steps) {
@@ -30,6 +34,15 @@ public class ConditionalSteps extends Step {
             return results;
         } else {
             return Collections.emptyList();
+        }
+    }
+
+    @Override
+    public void execute(TemplateExecutor exec) throws TemplateExecutionException {
+        if( steps != null && isActive(exec) ) {
+            for (Step step : steps) {
+                step.execute(exec);
+            }
         }
     }
 

@@ -71,8 +71,8 @@ public class TemplateExecutor {
             throw new TemplateExecutionException("Target is not a directory " + target);
         }
         if (steps != null) {
-            for (Input input : steps) {
-                input.ask(this);
+            for (Step step : steps) {
+                step.execute(this);
             }
         }
         if (files != null) {

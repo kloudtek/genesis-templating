@@ -43,14 +43,19 @@ public class Input extends Step {
     @XmlAttribute
     @JsonProperty
     protected Question.Type type = Question.Type.STRING;
+    @XmlAttribute
+    @JsonProperty
+    protected boolean refresh;
 
     @Override
     public List<Question> getQuestions(TemplateExecutor exec) throws TemplateExecutionException {
         updateDefaults(exec);
-        return Collections.singletonList(new Question(id, exec.filter(name), exec.filter(description), exec.filter(defaultValue), blankAllowed, options, advanced, type));
+        return Collections.singletonList(new Question(id, exec.filter(name), exec.filter(description),
+                exec.filter(defaultValue), blankAllowed, options, advanced, type, refresh));
     }
 
-    public void ask(TemplateExecutor exec) throws TemplateExecutionException {
+    @Override
+    public void execute(TemplateExecutor exec) throws TemplateExecutionException {
         updateDefaults(exec);
         if (!exec.containsVariable(id)) {
             String val = null;
