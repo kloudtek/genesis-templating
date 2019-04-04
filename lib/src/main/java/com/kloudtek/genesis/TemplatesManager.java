@@ -28,14 +28,21 @@ public class TemplatesManager {
             try {
                 Unmarshaller unmarshaller = XmlUtils.createJAXBUnmarshaller(Templates.class);
                 Templates templateList = (Templates) unmarshaller.unmarshal(url);
+                logger.debug("Template file contains "+templateList.getTemplates().size()+" templates");
                 for (Template template : templateList.getTemplates()) {
-                    String templateName = template.getName();
-                    if (templates.containsKey(templateName)) {
-                        throw new InvalidTemplateException("Found duplicate templates: " + url + " and " + templates.get(templateName));
+                    String templateId = template.getId();
+                    if( templateId == null ) {
+                        throw new InvalidTemplateException("Template missing id");
                     }
-                    templates.put(templateName, template);
-                    templatesUrl.put(templateName, url);
-                    logger.debug("Loaded template " + templateName);
+                    if( template.getName() == null ) {
+                        template.setName(templateId);
+                    }
+                    if (templates.containsKey(templateId)) {
+                        throw new InvalidTemplateException("Found duplicate templates for : " + templateId);
+                    }
+                    templates.put(templateId, template);
+                    templatesUrl.put(templateId, url);
+                    logger.debug("Loaded template " + templateId+" : "+template.getName());
                 }
             } catch (JAXBException e) {
                 throw new InvalidTemplateException("Invalid genesis template file: " + url + ": " + e.getMessage(), e);

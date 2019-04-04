@@ -24,7 +24,7 @@ public class Template {
     public Template() {
     }
 
-    @XmlAttribute
+    @XmlAttribute(required = true)
     public String getId() {
         return id;
     }
@@ -33,7 +33,7 @@ public class Template {
         this.id = id;
     }
 
-    @XmlAttribute
+    @XmlAttribute(required = true)
     public String getName() {
         return name;
     }

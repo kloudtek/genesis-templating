@@ -7,6 +7,8 @@ import com.kloudtek.genesis.TemplateExecutor;
 import com.kloudtek.genesis.VariableMissingException;
 import com.kloudtek.util.ConsoleUtils;
 import com.kloudtek.util.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import javax.xml.bind.annotation.XmlAccessType;
@@ -19,12 +21,13 @@ import java.util.List;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Input extends Step {
+    private static final Logger logger = LoggerFactory.getLogger(Input.class);
     @XmlAttribute(required = true)
     @JsonProperty(required = true)
     protected String id;
     @XmlAttribute(required = true)
     @JsonProperty(required = true)
-    protected String name;
+    protected String content;
     @XmlAttribute()
     @JsonProperty()
     protected String description;
@@ -50,7 +53,7 @@ public class Input extends Step {
     @Override
     public List<Question> getQuestions(TemplateExecutor exec) throws TemplateExecutionException {
         updateDefaults(exec);
-        return Collections.singletonList(new Question(id, exec.filter(name), exec.filter(description),
+        return Collections.singletonList(new Question(id, exec.filter(content), exec.filter(description),
                 exec.filter(defaultValue), blankAllowed, options, advanced, type, refresh));
     }
 
@@ -73,10 +76,10 @@ public class Input extends Step {
             } else {
                 while (val == null) {
                     if (exec.isHeadless()) {
-                        val = ConsoleUtils.read(name, df);
+                        val = ConsoleUtils.read(content, df);
                     } else {
                         // @#$@#$@#$#@ some kind of bug breaking icon on mac os, so forcing my own icon (sigh)
-                        ImageIcon icon = new ImageIcon(getClass().getResource("questionmark.png"));
+                        ImageIcon icon = new ImageIcon(getClass().getResource("/com/kloudtek/genesis/questionmark.png"));
                         Object defaultValue = df;
                         Object[] dialogOptions = null;
                         if (options != null && !options.isEmpty()) {
@@ -96,8 +99,9 @@ public class Input extends Step {
                                 dialogOptions = options.toArray();
                             }
                         }
+                        logger.debug("Input step question: "+ content);
                         String response = JOptionPane.showInputDialog(null,
-                                name, "Genesis Template Input Step", JOptionPane.QUESTION_MESSAGE, icon,
+                                content, "Genesis Template Input Step", JOptionPane.QUESTION_MESSAGE, icon,
                                 dialogOptions, defaultValue).toString();
                         if (response == null) {
                             throw new TemplateExecutionException("Template processing cancelled by user");
