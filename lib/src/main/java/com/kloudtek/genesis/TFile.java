@@ -40,16 +40,19 @@ public class TFile extends FSObj {
                     urlBuilder.path(template.getResourcePath());
                 }
                 urlBuilder.path(exec.filter(resource));
-                try (InputStream is = getClass().getResourceAsStream(urlBuilder.toString())) {
-                    if (process == null || process) {
-                        content = IOUtils.toString(is, getEncoding());
-                    } else {
-                        return is;
-                    }
+                String resourcePath = urlBuilder.toString();
+                InputStream is = getClass().getResourceAsStream(resourcePath);
+                if( is == null ) {
+                    throw new TemplateExecutionException("File resource missing: " + resourcePath);
                 }
+                if (process != null && ! process) {
+                    // we don't need to process so return the stream immediately
+                    return is;
+                }
+                content = IOUtils.toString(is, getEncoding());
             }
             if (content == null) {
-                throw new TemplateExecutionException("Content missing from " + path);
+                throw new TemplateExecutionException("Content missing: " + path);
             }
             if (trim == null || trim) {
                 content = content.trim();

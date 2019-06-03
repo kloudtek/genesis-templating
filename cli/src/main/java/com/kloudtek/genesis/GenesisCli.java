@@ -12,10 +12,12 @@ import java.util.concurrent.Callable;
 public class GenesisCli implements Callable<Void> {
     private static final Logger logger = LoggerFactory.getLogger(GenesisCli.class);
 
-    @Parameters(index = "0", description = "template file")
-    private String templatePath;
+    @Parameters(index = "0", description = "template")
+    private String template;
     @Parameters(index = "1", description = "target directory")
     private File target;
+    @Option(names = {"-a","--advanced"},description = "Enable advanced mode",defaultValue = "false")
+    private boolean advanced;
     @Option(names = "-D")
     private Map<String,String> vars;
 
@@ -24,12 +26,11 @@ public class GenesisCli implements Callable<Void> {
     }
 
     public Void call() throws Exception {
-        logger.info("Creating template using "+templatePath);
-        Template template = Template.create(this.templatePath);
-//        if( vars != null ) {
-//            template.addVariables(vars);
-//        }
-//        template.generate(target);
+        logger.info("Creating template using "+template);
+        TemplateExecutor executor = new TemplatesManager().createExecutor(template);
+        executor.setVariables(vars);
+        executor.setAdvanced(advanced);
+        executor.execute(target);
         return null;
     }
 }
