@@ -12,6 +12,7 @@ import javax.xml.bind.annotation.*;
 import java.io.*;
 import java.util.List;
 
+@XmlRootElement
 public class Template {
     private static final Logger logger = LoggerFactory.getLogger(Template.class);
     private String id;
@@ -20,6 +21,7 @@ public class Template {
     private List<Input> steps;
     private List<FSObj> files;
     private boolean overwrite;
+    private ResourceLoader resourceLoader;
 
     public Template() {
     }
@@ -119,6 +121,22 @@ public class Template {
     public void afterUnmarshal(Unmarshaller unmarshaller, Object parent) {
         for (FSObj file : files) {
             file.setTemplate(this);
+        }
+    }
+
+    public ResourceLoader getResourceLoader() {
+        return resourceLoader;
+    }
+
+    public void setResourceLoader(ResourceLoader resourceLoader) {
+        this.resourceLoader = resourceLoader;
+    }
+
+    public InputStream loadResource(String resourcePath) {
+        if( resourceLoader != null ) {
+            return resourceLoader.loadResource(resourcePath);
+        } else {
+            return getClass().getResourceAsStream(resourcePath);
         }
     }
 }

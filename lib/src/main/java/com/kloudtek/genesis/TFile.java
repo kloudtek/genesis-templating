@@ -41,7 +41,7 @@ public class TFile extends FSObj {
                 }
                 urlBuilder.path(exec.filter(resource));
                 String resourcePath = urlBuilder.toString();
-                InputStream is = getClass().getResourceAsStream(resourcePath);
+                InputStream is = template.loadResource(resourcePath);
                 if( is == null ) {
                     throw new TemplateExecutionException("File resource missing: " + resourcePath);
                 }

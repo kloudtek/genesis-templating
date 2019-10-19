@@ -16,7 +16,6 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -24,10 +23,10 @@ public class Input extends Step {
     private static final Logger logger = LoggerFactory.getLogger(Input.class);
     @XmlAttribute(required = true)
     @JsonProperty(required = true)
-    protected String id;
+    protected String var;
     @XmlAttribute(required = true)
     @JsonProperty(required = true)
-    protected String content;
+    protected String message;
     @XmlAttribute()
     @JsonProperty()
     protected String description;
@@ -43,27 +42,14 @@ public class Input extends Step {
     @XmlAttribute
     @JsonProperty
     protected boolean advanced;
-    @XmlAttribute
-    @JsonProperty
-    protected Question.Type type = Question.Type.STRING;
-    @XmlAttribute
-    @JsonProperty
-    protected boolean refresh;
-
-    @Override
-    public List<Question> getQuestions(TemplateExecutor exec) throws TemplateExecutionException {
-        updateDefaults(exec);
-        return Collections.singletonList(new Question(id, exec.filter(content), exec.filter(description),
-                exec.filter(defaultValue), blankAllowed, options, advanced, type, refresh));
-    }
 
     @Override
     public void execute(TemplateExecutor exec) throws TemplateExecutionException {
         updateDefaults(exec);
-        if (!exec.containsVariable(id)) {
+        if (!exec.containsVariable(var)) {
             String val = null;
             String df = exec.filter(defaultValue);
-            String dfOverride = exec.getDefaultValue(id);
+            String dfOverride = exec.getDefaultValue(var);
             if (StringUtils.isNotBlank(dfOverride)) {
                 df = dfOverride;
             }
@@ -71,12 +57,12 @@ public class Input extends Step {
                 if (df != null) {
                     val = df;
                 } else {
-                    throw new VariableMissingException("Variable " + id + " is missing", this);
+                    throw new VariableMissingException("Variable " + var + " is missing", this);
                 }
             } else {
                 while (val == null) {
                     if (exec.isHeadless()) {
-                        val = ConsoleUtils.read(content, df);
+                        val = ConsoleUtils.read(message, df);
                     } else {
                         // @#$@#$@#$#@ some kind of bug breaking icon on mac os, so forcing my own icon (sigh)
                         ImageIcon icon = new ImageIcon(getClass().getResource("/com/kloudtek/genesis/questionmark.png"));
@@ -99,9 +85,9 @@ public class Input extends Step {
                                 dialogOptions = options.toArray();
                             }
                         }
-                        logger.debug("Input step question: "+ content);
+                        logger.debug("Input step question: "+ message);
                         String response = JOptionPane.showInputDialog(null,
-                                content, "Genesis Template Input Step", JOptionPane.QUESTION_MESSAGE, icon,
+                                message, "Genesis Template Input Step", JOptionPane.QUESTION_MESSAGE, icon,
                                 dialogOptions, defaultValue).toString();
                         if (response == null) {
                             throw new TemplateExecutionException("Template processing cancelled by user");
@@ -114,21 +100,21 @@ public class Input extends Step {
                 }
             }
             if (!checkValid(val)) {
-                throw new InvalidVariableException("Invalid variable " + id + " value: " + val);
+                throw new InvalidVariableException("Invalid variable " + var + " value: " + val);
             } else {
-                exec.setVariable(id, val);
+                exec.setVariable(var, val);
             }
         } else {
-            String value = exec.getVariable(id);
+            String value = exec.getVariable(var);
             if (!checkValid(value)) {
-                throw new InvalidVariableException("Invalid variable " + id + " value: " + value);
+                throw new InvalidVariableException("Invalid variable " + var + " value: " + value);
             }
         }
     }
 
     private void updateDefaults(TemplateExecutor exec) throws TemplateExecutionException {
-        if( defaultValue != null && exec.resolveVariable(id) == null ) {
-            exec.getDefaults().put(id,exec.filter(defaultValue));
+        if( defaultValue != null && exec.resolveVariable(var) == null ) {
+            exec.getDefaults().put(var,exec.filter(defaultValue));
         }
     }
 

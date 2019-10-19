@@ -23,21 +23,6 @@ public class ConditionalSteps extends Step {
     }
 
     @Override
-    public List<Question> getQuestions(TemplateExecutor exec) throws TemplateExecutionException {
-        if (isActive(exec)) {
-            List<Question> results = new ArrayList<>();
-            if( steps != null ) {
-                for (Step step : steps) {
-                    results.addAll(step.getQuestions(exec));
-                }
-            }
-            return results;
-        } else {
-            return Collections.emptyList();
-        }
-    }
-
-    @Override
     public void execute(TemplateExecutor exec) throws TemplateExecutionException {
         if( steps != null && isActive(exec) ) {
             for (Step step : steps) {

@@ -1,5 +1,6 @@
 package com.kloudtek.genesis;
 
+import com.kloudtek.util.UnexpectedException;
 import com.kloudtek.util.xml.XmlUtils;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -7,7 +8,9 @@ import org.slf4j.LoggerFactory;
 
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
+import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -26,7 +29,7 @@ public class TemplatesManager {
             URL url = resources.nextElement();
             logger.debug("Found template file " + url.toString());
             try {
-                Unmarshaller unmarshaller = XmlUtils.createJAXBUnmarshaller(Templates.class);
+                Unmarshaller unmarshaller = getUnmarshaller(Templates.class);
                 Templates templateList = (Templates) unmarshaller.unmarshal(url);
                 logger.debug("Template file contains "+templateList.getTemplates().size()+" templates");
                 for (Template template : templateList.getTemplates()) {
@@ -51,17 +54,43 @@ public class TemplatesManager {
     }
 
 
-    public TemplateExecutor createExecutor(String templateName) throws TemplateNotFoundException, TemplateExecutionException {
+    public TemplateExecutor createExecutor(String templateName) throws TemplateNotFoundException, InvalidTemplateException {
         Template template = getTemplate(templateName);
         return new TemplateExecutor(template);
     }
 
     @NotNull
-    public Template getTemplate(String templateName) throws TemplateNotFoundException {
+    public Template getTemplate(String templateName) throws TemplateNotFoundException, InvalidTemplateException {
+        Unmarshaller unmarshaller = getUnmarshaller(Template.class);
+        try {
+            return (Template) unmarshaller.unmarshal(new URL(templateName));
+        } catch (JAXBException e) {
+            if( !templates.containsKey(templateName)) {
+                throw new InvalidTemplateException(e);
+            }
+        } catch (MalformedURLException e) {
+            //
+        }
+        File file = new File(templateName);
+        if( file.exists() ) {
+            try {
+                return (Template) unmarshaller.unmarshal(file);
+            } catch (JAXBException e) {
+                throw new InvalidTemplateException(e);
+            }
+        }
         Template template = templates.get(templateName);
         if (template == null) {
             throw new TemplateNotFoundException("Unable to find template " + templateName);
         }
         return template;
+    }
+
+    private Unmarshaller getUnmarshaller(Class<?> cl) {
+        try {
+            return XmlUtils.createJAXBUnmarshaller(cl);
+        } catch (JAXBException e) {
+            throw new UnexpectedException(e);
+        }
     }
 }

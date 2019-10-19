@@ -32,6 +32,19 @@ public class TemplatesManagerTest {
     }
 
     @Test
+    public void testStandaloneSimpleAsUrl() throws Exception {
+        executeWithVar(getClass().getResource("/standalone-testOneFile.xml").toString(), "testval", "someval");
+        assertOneFile("# someval");
+    }
+
+    @Test
+    public void testStandaloneSimpleAsFile() throws Exception {
+        File fh = new File(getClass().getResource("/standalone-testOneFile.xml").toURI());
+        executeWithVar(fh.getPath(), "testval", "someval");
+        assertOneFile("# someval");
+    }
+
+    @Test
     public void testValNoInput() throws Exception {
         executeWithVar(TEST_ONE_FILE, "testval", "someval");
         assertOneFile("# someval");
@@ -92,14 +105,14 @@ public class TemplatesManagerTest {
 //        executeWithVar(TEST_WITH_OPTIONS, "myval", "ba");
 //    }
 
-    private TemplateExecutor executeWithVar(String testWithOptions, String myval, String foo) throws TemplateNotFoundException, TemplateExecutionException {
+    private TemplateExecutor executeWithVar(String testWithOptions, String myval, String foo) throws Exception {
         TemplateExecutor executor = createExecutor(testWithOptions);
         executor.setVariable(myval, foo);
         executor.execute(tmpDir);
         return executor;
     }
 
-    private TemplateExecutor createExecutor(String templateName) throws TemplateNotFoundException, TemplateExecutionException {
+    private TemplateExecutor createExecutor(String templateName) throws TemplateNotFoundException, TemplateExecutionException, InvalidTemplateException {
         TemplateExecutor executor = templatesManager.createExecutor(templateName);
         executor.setNonInteractive(true);
         return executor;

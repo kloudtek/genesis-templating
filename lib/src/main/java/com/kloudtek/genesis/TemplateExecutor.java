@@ -1,7 +1,6 @@
 package com.kloudtek.genesis;
 
 import com.kloudtek.genesis.step.Input;
-import com.kloudtek.genesis.step.Question;
 import com.kloudtek.genesis.step.Step;
 import freemarker.cache.StringTemplateLoader;
 import freemarker.template.Configuration;
@@ -12,7 +11,6 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -43,7 +41,7 @@ public class TemplateExecutor {
             return null;
         }
         try {
-            Map<String,Object> vars = new HashMap<>();
+            Map<String, Object> vars = new HashMap<>();
             vars.putAll(defaults);
             vars.putAll(defaultOverrides);
             vars.putAll(variables);
@@ -88,27 +86,7 @@ public class TemplateExecutor {
         }
     }
 
-    public synchronized List<Question> getQuestions() throws TemplateExecutionException {
-        defaults.clear();
-        ArrayList<Question> questions = new ArrayList<>();
-        if (template.getSteps() != null) {
-            for (Step step : template.getSteps()) {
-                List<Question> stepQuestions = step.getQuestions(this);
-                if (!stepQuestions.isEmpty()) {
-                    questions.addAll(stepQuestions);
-                }
-            }
-        }
-        for (Question question : questions) {
-            String var = variables.get(question.getId());
-            if (var != null) {
-                question.setDefaultValue(var);
-            }
-        }
-        return questions;
-    }
-
-    private boolean checkConflicts() throws TemplateExecutionException {
+    private boolean checkConflicts() {
         for (FSObj file : files) {
             if (file.isConflict()) {
                 return true;
@@ -118,9 +96,9 @@ public class TemplateExecutor {
     }
 
     public String resolveVariable(String id) {
-        if (variables.containsKey(id) ) {
+        if (variables.containsKey(id)) {
             return variables.get(id);
-        } else if( defaultOverrides.containsKey(id)) {
+        } else if (defaultOverrides.containsKey(id)) {
             return defaultOverrides.get(id);
         } else {
             return defaults.get(id);

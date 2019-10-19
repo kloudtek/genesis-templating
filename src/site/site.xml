@@ -1,0 +1,28 @@
+<!--
+  ~ Copyright (c) Aeontronix 2019
+  -->
+
+<project name="Genesis Templating">
+    <skin>
+        <groupId>org.apache.maven.skins</groupId>
+        <artifactId>maven-fluido-skin</artifactId>
+        <version>1.8</version>
+    </skin>
+    <version position="right"/>
+    <custom>
+        <fluidoSkin>
+            <topBarEnabled>true</topBarEnabled>
+            <sideBarEnabled>false</sideBarEnabled>
+        </fluidoSkin>
+    </custom>
+    <body>
+        <menu ref="parent"/>
+        <menu name="Documentation">
+            <item name="Creating Templates" href="templates.html"/>
+            <item name="Usage: Maven (With POM)" href="usage-maven-with-pom.html"/>
+            <item name="Usage: Maven (Without POM)" href="usage-maven-with-pom.xml"/>
+        </menu>
+        <menu ref="modules" />
+        <menu ref="reports"/>
+    </body>
+</project>
