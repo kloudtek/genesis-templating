@@ -1,15 +1,16 @@
 package com.kloudtek.genesis;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kloudtek.genesis.step.ConditionalSteps;
 import com.kloudtek.genesis.step.Input;
-import com.kloudtek.util.xml.XmlUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.*;
 import java.io.*;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.List;
 
 @XmlRootElement
@@ -24,6 +25,10 @@ public class Template {
     private ResourceLoader resourceLoader;
 
     public Template() {
+    }
+
+    public Template(ResourceLoader resourceLoader) {
+        this.resourceLoader = resourceLoader;
     }
 
     @XmlAttribute(required = true)
@@ -54,16 +59,63 @@ public class Template {
     }
 
     public static Template create(String path) throws TemplateNotFoundException, InvalidTemplateException, IOException {
-        try (InputStream is = getStream(path)) {
+        Template template;
+        ObjectMapper objectMapper = new ObjectMapper();
+        String lpath = path.toLowerCase();
+        try {
+            URL url = new URL(path);
+            if(lpath.endsWith(".json")) {
+                return loadJson(url);
+            } else if( lpath.endsWith(".jar") || lpath.endsWith(".zip") ) {
+
+            }
+        } catch (MalformedURLException e) {
+            File file = new File(path);
+            if (file.exists()) {
+                if (file.isDirectory()) {
+                    return loadTemplate(new DirectoryResourceLoader(file));
+                } else {
+                    if (lpath.endsWith(".json")) {
+                        return loadJson(file);
+                    } else if( lpath.endsWith(".jar") || lpath.endsWith(".zip") ) {
+                        return loadTemplate(new ZipResourceLoader(file));
+                    }
+                }
+            } else {
+                throw new TemplateNotFoundException("Template "+path +" not found");
+            }
+        }
+        return null;
+    }
+
+    private static Template loadTemplate(ResourceLoader resourceLoader) throws IOException, InvalidTemplateException {
+        try (InputStream is = resourceLoader.loadResource("genesis-template.json'")) {
             if (is == null) {
-                throw new TemplateNotFoundException("Template not found: " + path);
+                throw new InvalidTemplateException("Unable to find template file in archive");
             }
-            try {
-                Unmarshaller unmarshaller = XmlUtils.createJAXBUnmarshaller(Template.class);
-                return (Template) unmarshaller.unmarshal(is);
-            } catch (JAXBException e) {
-                throw new InvalidTemplateException(e);
+            Template template = loadJson(is);
+            template.setResourceLoader(resourceLoader);
+            return template;
+        }
+    }
+
+    private static Template loadJson(InputStream is) throws IOException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        return objectMapper.readValue(is,Template.class);
+    }
+
+    private static Template loadJson(URL url) throws IOException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        return objectMapper.readValue(url,Template.class);
+    }
+
+    private static Template loadJson(File file) throws InvalidTemplateException {
+        try {
+            try( FileInputStream is = new FileInputStream(file) ){
+                return loadJson(is);
             }
+        } catch (IOException e) {
+            throw new InvalidTemplateException(e);
         }
     }
 
@@ -133,7 +185,7 @@ public class Template {
     }
 
     public InputStream loadResource(String resourcePath) {
-        if( resourceLoader != null ) {
+        if (resourceLoader != null) {
             return resourceLoader.loadResource(resourcePath);
         } else {
             return getClass().getResourceAsStream(resourcePath);

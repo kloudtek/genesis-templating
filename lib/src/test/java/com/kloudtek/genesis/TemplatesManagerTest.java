@@ -19,11 +19,9 @@ public class TemplatesManagerTest {
     public static final String TEST_ONE_FILE_WITH_INPUT = "testOneFileWithInput";
     public static final String TEST_WITH_OPTIONS = "testWithOptions";
     private TempDir tmpDir;
-    private TemplatesManager templatesManager;
 
     @Before
     public void init() throws IOException, InvalidTemplateException {
-        templatesManager = new TemplatesManager();
         tmpDir = TempDir.createMavenTmpDir();
     }
 
@@ -113,9 +111,10 @@ public class TemplatesManagerTest {
     }
 
     private TemplateExecutor createExecutor(String templateName) throws TemplateNotFoundException, TemplateExecutionException, InvalidTemplateException {
-        TemplateExecutor executor = templatesManager.createExecutor(templateName);
-        executor.setNonInteractive(true);
-        return executor;
+//        TemplateExecutor executor = templatesManager.createExecutor(templateName);
+//        executor.setNonInteractive(true);
+//        return executor;
+        return null;
     }
 
     private void assertOneFile(String expectedContent) throws IOException {
