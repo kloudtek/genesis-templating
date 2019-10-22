@@ -1,0 +1,12 @@
+{
+  "files": [
+    {
+      "path": "README.md",
+      "content": "# ${testval}"
+    },
+    {
+      "path": "bar.txt",
+      "resource": "foo.txt"
+    }
+  ]
+}

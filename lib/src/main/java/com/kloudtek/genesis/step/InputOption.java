@@ -1,8 +1,11 @@
 package com.kloudtek.genesis.step;
 
+import com.kloudtek.genesis.TemplateExecutionException;
+import com.kloudtek.genesis.TemplateExecutor;
+
 import javax.xml.bind.annotation.XmlAttribute;
 
-public class InputOption {
+public class InputOption extends Step {
     private String id;
     private String text;
 
@@ -27,5 +30,9 @@ public class InputOption {
     @Override
     public String toString() {
         return text;
+    }
+
+    @Override
+    public void execute(TemplateExecutor exec) throws TemplateExecutionException {
     }
 }

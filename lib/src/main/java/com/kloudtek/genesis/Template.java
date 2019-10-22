@@ -1,15 +1,20 @@
 package com.kloudtek.genesis;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kloudtek.genesis.step.ConditionalSteps;
 import com.kloudtek.genesis.step.Input;
+import com.kloudtek.util.UnexpectedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.xml.bind.Unmarshaller;
-import javax.xml.bind.annotation.*;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
+import javax.xml.bind.annotation.XmlElements;
+import javax.xml.bind.annotation.XmlRootElement;
 import java.io.*;
 import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.List;
 
@@ -20,7 +25,7 @@ public class Template {
     private String name;
     private String resourcePath;
     private List<Input> steps;
-    private List<FSObj> files;
+    private List<TFile> files;
     private boolean overwrite;
     private ResourceLoader resourceLoader;
 
@@ -31,7 +36,7 @@ public class Template {
         this.resourceLoader = resourceLoader;
     }
 
-    @XmlAttribute(required = true)
+    @JsonProperty
     public String getId() {
         return id;
     }
@@ -40,7 +45,7 @@ public class Template {
         this.id = id;
     }
 
-    @XmlAttribute(required = true)
+    @JsonProperty(required = true)
     public String getName() {
         return name;
     }
@@ -49,7 +54,7 @@ public class Template {
         this.name = name;
     }
 
-    @XmlAttribute
+    @JsonProperty
     public String getResourcePath() {
         return resourcePath;
     }
@@ -62,34 +67,41 @@ public class Template {
         Template template;
         ObjectMapper objectMapper = new ObjectMapper();
         String lpath = path.toLowerCase();
+        File file = null;
         try {
             URL url = new URL(path);
-            if(lpath.endsWith(".json")) {
-                return loadJson(url);
-            } else if( lpath.endsWith(".jar") || lpath.endsWith(".zip") ) {
+            if (url.getProtocol().equalsIgnoreCase("file")) {
+                file = new File(url.toURI());
+            }else{
+                if (lpath.endsWith(".json")) {
+                    return loadJson(url);
+                } else if (lpath.endsWith(".jar") || lpath.endsWith(".zip")) {
 
+                }
             }
         } catch (MalformedURLException e) {
-            File file = new File(path);
-            if (file.exists()) {
-                if (file.isDirectory()) {
-                    return loadTemplate(new DirectoryResourceLoader(file));
-                } else {
-                    if (lpath.endsWith(".json")) {
-                        return loadJson(file);
-                    } else if( lpath.endsWith(".jar") || lpath.endsWith(".zip") ) {
-                        return loadTemplate(new ZipResourceLoader(file));
-                    }
-                }
+            file = new File(path);
+        } catch (URISyntaxException e) {
+            throw new UnexpectedException(e);
+        }
+        if (file != null && file.exists()) {
+            if (file.isDirectory()) {
+                return loadTemplate(new DirectoryResourceLoader(file));
             } else {
-                throw new TemplateNotFoundException("Template "+path +" not found");
+                if (lpath.endsWith(".json")) {
+                    return loadJson(file);
+                } else if (lpath.endsWith(".jar") || lpath.endsWith(".zip")) {
+                    return loadTemplate(new ZipResourceLoader(file));
+                }
             }
+        } else {
+            throw new TemplateNotFoundException("Template " + path + " not found");
         }
         return null;
     }
 
     private static Template loadTemplate(ResourceLoader resourceLoader) throws IOException, InvalidTemplateException {
-        try (InputStream is = resourceLoader.loadResource("genesis-template.json'")) {
+        try (InputStream is = resourceLoader.loadResource("genesis-template.json")) {
             if (is == null) {
                 throw new InvalidTemplateException("Unable to find template file in archive");
             }
@@ -101,17 +113,17 @@ public class Template {
 
     private static Template loadJson(InputStream is) throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
-        return objectMapper.readValue(is,Template.class);
+        return objectMapper.readValue(is, Template.class);
     }
 
     private static Template loadJson(URL url) throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
-        return objectMapper.readValue(url,Template.class);
+        return objectMapper.readValue(url, Template.class);
     }
 
     private static Template loadJson(File file) throws InvalidTemplateException {
         try {
-            try( FileInputStream is = new FileInputStream(file) ){
+            try (FileInputStream is = new FileInputStream(file)) {
                 return loadJson(is);
             }
         } catch (IOException e) {
@@ -149,16 +161,12 @@ public class Template {
         this.steps = steps;
     }
 
-    @XmlElementWrapper(name = "files")
-    @XmlElements({
-            @XmlElement(name = "file", type = TFile.class),
-            @XmlElement(name = "dir", type = Directory.class)
-    })
-    public List<FSObj> getFiles() {
+    @JsonProperty
+    public List<TFile> getFiles() {
         return files;
     }
 
-    public void setFiles(List<FSObj> files) {
+    public void setFiles(List<TFile> files) {
         this.files = files;
     }
 
@@ -168,12 +176,6 @@ public class Template {
 
     public void setOverwrite(boolean overwrite) {
         this.overwrite = overwrite;
-    }
-
-    public void afterUnmarshal(Unmarshaller unmarshaller, Object parent) {
-        for (FSObj file : files) {
-            file.setTemplate(this);
-        }
     }
 
     public ResourceLoader getResourceLoader() {

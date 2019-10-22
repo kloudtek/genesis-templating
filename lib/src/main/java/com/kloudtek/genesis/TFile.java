@@ -6,11 +6,18 @@ import com.kloudtek.util.URLBuilder;
 import com.kloudtek.util.io.IOUtils;
 
 import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlTransient;
+import javax.xml.bind.annotation.XmlValue;
 import java.io.*;
 
-public class TFile extends FSObj {
-    @XmlAttribute
-    private Boolean trim;
+public class TFile {
+    protected String path;
+    protected String content;
+    protected String ignore;
+    @XmlTransient
+    protected File file;
+    @XmlTransient
+    protected Template template;
     @XmlAttribute
     private Boolean process;
     @XmlAttribute
@@ -35,7 +42,7 @@ public class TFile extends FSObj {
     private InputStream getContent(TemplateExecutor exec) throws TemplateExecutionException {
         try {
             if (StringUtils.isNotBlank(resource)) {
-                URLBuilder urlBuilder = new URLBuilder("/");
+                URLBuilder urlBuilder = new URLBuilder("/files/");
                 if( template.getResourcePath() != null ) {
                     urlBuilder.path(template.getResourcePath());
                 }
@@ -54,9 +61,6 @@ public class TFile extends FSObj {
             if (content == null) {
                 throw new TemplateExecutionException("Content missing: " + path);
             }
-            if (trim == null || trim) {
-                content = content.trim();
-            }
             if (process == null || process) {
                 return new ByteArrayInputStream(exec.filter(content).getBytes(getEncoding()));
             } else {
@@ -70,4 +74,65 @@ public class TFile extends FSObj {
     public String getEncoding() {
         return encoding != null ? encoding : "UTF-8";
     }
+
+
+    public void setTemplate(Template template) {
+        this.template = template;
+    }
+
+    public boolean isConflict() {
+        return file.exists();
+    }
+
+    public void process(TemplateExecutor exec, File target, Template template) throws TemplateExecutionException {
+        this.template = template;
+        path = exec.filter(path);
+        file = new File(target + File.separator + path);
+        ignore = exec.filter(ignore);
+    }
+
+    public Boolean getProcess() {
+        return process;
+    }
+
+    public void setProcess(Boolean process) {
+        this.process = process;
+    }
+
+    public void setEncoding(String encoding) {
+        this.encoding = encoding;
+    }
+
+    public String getResource() {
+        return resource;
+    }
+
+    public void setResource(String resource) {
+        this.resource = resource;
+    }
+
+    public String getPath() {
+        return path;
+    }
+
+    public void setPath(String path) {
+        this.path = path;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
+    }
+
+    public String getIgnore() {
+        return ignore;
+    }
+
+    public void setIgnore(String ignore) {
+        this.ignore = ignore;
+    }
+
 }

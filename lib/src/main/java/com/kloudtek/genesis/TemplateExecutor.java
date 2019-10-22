@@ -20,7 +20,7 @@ public class TemplateExecutor {
     private final Configuration fmCfg;
     private Template template;
     private List<Input> steps;
-    private List<FSObj> files;
+    private List<TFile> files;
     private final Map<String, String> variables = new HashMap<>();
     private final Map<String, String> defaultOverrides = new HashMap<>();
     private final Map<String, String> defaults = new HashMap<>();
@@ -74,20 +74,20 @@ public class TemplateExecutor {
             }
         }
         if (files != null) {
-            for (FSObj file : files) {
-                file.process(this, target);
+            for (TFile file : files) {
+                file.process(this, target, template);
             }
             if (checkConflicts()) {
                 // todo
             }
-            for (FSObj file : files) {
+            for (TFile file : files) {
                 file.create(this, target);
             }
         }
     }
 
     private boolean checkConflicts() {
-        for (FSObj file : files) {
+        for (TFile file : files) {
             if (file.isConflict()) {
                 return true;
             }

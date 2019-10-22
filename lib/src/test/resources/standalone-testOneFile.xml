@@ -1,7 +1,0 @@
-<template id="testOneFile">
-    <files>
-        <file path="README.md">
-            # ${testval}
-        </file>
-    </files>
-</template>

@@ -9,14 +9,16 @@ import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 import java.util.Arrays;
 
 import static junit.framework.TestCase.assertTrue;
 import static junit.framework.TestCase.fail;
 
 public class TemplatesManagerTest {
-    public static final String TEST_ONE_FILE = "testOneFile";
-    public static final String TEST_ONE_FILE_WITH_INPUT = "testOneFileWithInput";
+    public static final String TEST_ONE_FILE = TemplatesManagerTest.class.getResource("/test-one-file.json").toString();
+    public static final String TEST_ONE_FILE_WITH_INPUT = TemplatesManagerTest.class.getResource("/test-one-file-winputs.json").toString();
     public static final String TEST_WITH_OPTIONS = "testWithOptions";
     private TempDir tmpDir;
 
@@ -27,19 +29,7 @@ public class TemplatesManagerTest {
 
     @After
     public void cleanup() {
-    }
-
-    @Test
-    public void testStandaloneSimpleAsUrl() throws Exception {
-        executeWithVar(getClass().getResource("/standalone-testOneFile.xml").toString(), "testval", "someval");
-        assertOneFile("# someval");
-    }
-
-    @Test
-    public void testStandaloneSimpleAsFile() throws Exception {
-        File fh = new File(getClass().getResource("/standalone-testOneFile.xml").toURI());
-        executeWithVar(fh.getPath(), "testval", "someval");
-        assertOneFile("# someval");
+        tmpDir.close();
     }
 
     @Test
@@ -98,6 +88,14 @@ public class TemplatesManagerTest {
         executeWithVar(TEST_WITH_OPTIONS, "myval", "ba");
     }
 
+    @Test
+    public void testFullexample() throws Exception {
+        executeWithVar(TemplatesManagerTest.class.getResource("/fullexample").toString(), "testval", "foo");
+        assertFile("README.md","# foo");
+        assertFile("bar.txt","bar");
+    }
+
+
 //    @Test(expected = InvalidVariableException.class)
 //    public void testWithInvalidOptionVar() throws Exception {
 //        executeWithVar(TEST_WITH_OPTIONS, "myval", "ba");
@@ -110,17 +108,21 @@ public class TemplatesManagerTest {
         return executor;
     }
 
-    private TemplateExecutor createExecutor(String templateName) throws TemplateNotFoundException, TemplateExecutionException, InvalidTemplateException {
-//        TemplateExecutor executor = templatesManager.createExecutor(templateName);
-//        executor.setNonInteractive(true);
-//        return executor;
-        return null;
+    private TemplateExecutor createExecutor(String templateName) throws TemplateNotFoundException, TemplateExecutionException, InvalidTemplateException, IOException {
+        TemplateExecutor executor = new TemplateExecutor(Template.create(templateName));
+        executor.setNonInteractive(true);
+        return executor;
+    }
+
+    private void assertFile(String path, String expectedContent) throws IOException {
+        String fileContent = FileUtils.toString(new File(tmpDir.getPath()+File.separator+path.replace("/",File.separator)));
+        Assert.assertEquals(expectedContent.trim(),fileContent.trim());
     }
 
     private void assertOneFile(String expectedContent) throws IOException {
         File[] files = tmpDir.listFiles();
         Assert.assertTrue("Only one file should exist, but found "+( (files != null && files.length > 0 )  ? Arrays.toString(files) : "none"),files != null && files.length == 1);
         String fileContent = FileUtils.toString(files[0]);
-        Assert.assertEquals(expectedContent,fileContent);
+        Assert.assertEquals(expectedContent.trim(),fileContent.trim());
     }
 }

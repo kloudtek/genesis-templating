@@ -1,0 +1,14 @@
+{
+  "steps": [
+    {
+      "type": "input",
+      "var": "testval"
+    }
+  ],
+  "files": [
+    {
+      "path": "README.md",
+      "content": "# ${testval}"
+    }
+  ]
+}
