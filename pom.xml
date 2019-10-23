@@ -4,35 +4,35 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.kloudtek.genesis</groupId>
+    <groupId>com.aeontronix.genesis</groupId>
     <artifactId>genesis-templating</artifactId>
     <packaging>pom</packaging>
     <version>1.0-SNAPSHOT</version>
     <name>Genesis Templating</name>
     <description>Advanced project template technology</description>
-    <url>https://github.com/kloudtek/genesis-templating</url>
+    <url>https://gitlab.com/aeontronix/oss/genesis-templating</url>
 
     <organization>
-        <name>Kloudtek</name>
-        <url>http://www.kloudtek.com</url>
+        <name>Aeontronix</name>
+        <url>http://www.aeontronix.com</url>
     </organization>
 
     <developers>
         <developer>
             <name>Dev Team</name>
-            <organization>Kloudtek</organization>
+            <organization>Aeontronix</organization>
         </developer>
     </developers>
 
     <issueManagement>
         <system>Github</system>
-        <url>https://github.com/kloudtek/genesis-templating/issues</url>
+        <url>https://gitlab.com/aeontronix/oss/genesis-templating/issues</url>
     </issueManagement>
 
     <scm>
-        <url>scm:git:git@github.com:kloudtek/genesis-templating.git</url>
-        <connection>scm:git:git@github.com:kloudtek/genesis-templating.git</connection>
-        <developerConnection>scm:git:git@github.com:kloudtek/genesis-templating.git</developerConnection>
+        <url>scm:git:git@gitlab.com:aeontronix/oss/genesis-templating.git</url>
+        <connection>scm:git:git@gitlab.com:aeontronix/oss/genesis-templating.git</connection>
+        <developerConnection>scm:git:git@gitlab.com:aeontronix/oss/genesis-templating.git</developerConnection>
     </scm>
 
     <licenses>

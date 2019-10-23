@@ -31,7 +31,7 @@ In order to use this method, create a project with a single pom.xml with the fol
     <build>
         <plugins>
             <plugin>
-                <groupId>com.kloudtek.genesis</groupId>
+                <groupId>com.aeontronix.genesis</groupId>
                 <artifactId>genesis-maven</artifactId>
                 <version>1.0-SNAPSHOT</version>
                 <executions>

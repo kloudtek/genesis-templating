@@ -1,20 +1,16 @@
-package com.kloudtek.genesis.step;
+package com.aeontronix.genesis.step;
 
+import com.aeontronix.genesis.InvalidVariableException;
+import com.aeontronix.genesis.TemplateExecutor;
+import com.aeontronix.genesis.VariableMissingException;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.kloudtek.genesis.InvalidVariableException;
-import com.kloudtek.genesis.TemplateExecutionException;
-import com.kloudtek.genesis.TemplateExecutor;
-import com.kloudtek.genesis.VariableMissingException;
+import com.aeontronix.genesis.TemplateExecutionException;
 import com.kloudtek.util.ConsoleUtils;
 import com.kloudtek.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -67,7 +63,7 @@ public class Input extends Step {
                         val = ConsoleUtils.read(message, df);
                     } else {
                         // @#$@#$@#$#@ some kind of bug breaking icon on mac os, so forcing my own icon (sigh)
-                        ImageIcon icon = new ImageIcon(getClass().getResource("/com/kloudtek/genesis/questionmark.png"));
+                        ImageIcon icon = new ImageIcon(getClass().getResource("/com/aeontronix/genesis/questionmark.png"));
                         Object defaultValue = df;
                         Object[] dialogOptions = null;
                         if (options != null && !options.isEmpty()) {
