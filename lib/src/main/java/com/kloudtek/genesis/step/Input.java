@@ -18,7 +18,6 @@ import javax.xml.bind.annotation.XmlElement;
 import java.util.ArrayList;
 import java.util.List;
 
-@XmlAccessorType(XmlAccessType.FIELD)
 public class Input extends Step {
     private static final Logger logger = LoggerFactory.getLogger(Input.class);
     @JsonProperty(required = true)
@@ -38,10 +37,20 @@ public class Input extends Step {
 
     @Override
     public void execute(TemplateExecutor exec) throws TemplateExecutionException {
+        var = exec.filter(var);
+        message = exec.filter(message);
+        description = exec.filter(description);
+        defaultValue = exec.filter(defaultValue);
+        if( options != null ) {
+            for (InputOption option : options) {
+                option.setId(exec.filter(option.getId()));
+                option.setText(exec.filter(option.getText()));
+            }
+        }
         updateDefaults(exec);
         if (!exec.containsVariable(var)) {
             String val = null;
-            String df = exec.filter(defaultValue);
+            String df = defaultValue;
             String dfOverride = exec.getDefaultValue(var);
             if (StringUtils.isNotBlank(dfOverride)) {
                 df = dfOverride;
@@ -107,7 +116,7 @@ public class Input extends Step {
 
     private void updateDefaults(TemplateExecutor exec) throws TemplateExecutionException {
         if( defaultValue != null && exec.resolveVariable(var) == null ) {
-            exec.getDefaults().put(var,exec.filter(defaultValue));
+            exec.getDefaults().put(var,defaultValue);
         }
     }
 

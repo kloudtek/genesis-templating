@@ -16,8 +16,10 @@ public class ConditionalSteps extends Step {
     private String value;
 
     public boolean isActive(TemplateExecutor exec) throws TemplateExecutionException {
-        String varId = exec.filter(condition);
-        String match = value != null ? exec.filter(value) : null;
+        value = exec.filter(value);
+        condition = exec.filter(condition);
+        String varId = condition;
+        String match = value;
         String resolvedValue = exec.resolveVariable(varId);
         return match != null ? resolvedValue.equals(match) : Boolean.parseBoolean(resolvedValue);
     }
@@ -31,10 +33,7 @@ public class ConditionalSteps extends Step {
         }
     }
 
-    @XmlElements({
-            @XmlElement(name = "input", type = Input.class),
-            @XmlElement(name = "conditional", type = ConditionalSteps.class)
-    })
+
     public List<Step> getSteps() {
         return steps;
     }

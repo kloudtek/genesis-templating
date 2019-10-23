@@ -95,8 +95,7 @@ public class TemplateMojo extends AbstractMojo {
                     }
                 }
                 getLog().debug("Loading genesis template");
-                TemplatesManager templatesManager = new TemplatesManager();
-                Template template = templatesManager.getTemplate(this.template);
+                Template template = Template.create(this.template);
                 TemplateExecutor exec = new TemplateExecutor(template);
                 if (vars != null) {
                     exec.setVariables(vars);

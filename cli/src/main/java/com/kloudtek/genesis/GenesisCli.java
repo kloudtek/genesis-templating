@@ -27,7 +27,7 @@ public class GenesisCli implements Callable<Void> {
 
     public Void call() throws Exception {
         logger.info("Creating template using "+template);
-        TemplateExecutor executor = new TemplatesManager().createExecutor(template);
+        TemplateExecutor executor = new TemplateExecutor(Template.create(template));
         executor.setVariables(vars);
         executor.setAdvanced(advanced);
         executor.execute(target);

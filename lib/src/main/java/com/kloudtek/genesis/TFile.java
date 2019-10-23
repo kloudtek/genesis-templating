@@ -91,6 +91,8 @@ public class TFile {
         path = exec.filter(path);
         file = new File(target + File.separator + path);
         ignore = exec.filter(ignore);
+        encoding = exec.filter(encoding);
+        resource = exec.filter(resource);
     }
 
     public Boolean getProcess() {

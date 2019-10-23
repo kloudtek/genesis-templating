@@ -11,7 +11,7 @@ The template engine will then run through all the steps that are defined in the 
 For example a commonly used step for example is "input", which will request input from the user and set the provided response in a variable.
 
 After all step are processed, it will go through each file, process it as a [freemarker](https://freemarker.apache.org/) 
-template, and then use the that [freemarker](https://freemarker.apache.org/) template combined with all variables and write the 
+template, and then use that template combined with all variables and write the 
 resulting file content.
 
 # Template file
@@ -25,14 +25,14 @@ path to find the template.
 The template path also supports a special scheme `classpath://` which will attempt to find one (and only one) 
 genesis-template.json (or .yml) file.
 
-The top level JSON object can contain the following (optional) high level attributes are supported:
-
 | attribute name | type | optional | value |
 |----------------|------|------|----|
 | title | string | Yes | A short title describing the template's purpose|
 | description | string | Yes | A more extended description
 | files | array | Yes | files to generate
 | steps | array | Yes | steps to run through before generating the template
+| id | string | No | Unique id of your template (used when loading the template from the classpath and multiple templates are available) 
+| resourcePath | string | No | Location of resource files (defaults to `files`)
 
 ie:
 
@@ -45,19 +45,57 @@ ie:
 }
 ```
 
+All string attributes within file and steps objects are also processed through 
+freemarker, which can be used for example to have file dynamic paths, or dynamically include/exclude files.
+
+# Steps
+
+Genesis templating supports the following steps out-of-the-box:
+
+## Input
+
+This step is used to request the user for a value that is saved in a jar.
+
+| attribute name | type | optional | value |
+|----------------|----------|------|-------|
+| type | string | No | must be set to `input`
+| var | string | No | Variable name the response must be assigned to
+| message | string | No | Message to display to use when requesting the input value
+| default | string | Yes | Default value
+| blankAllowed | boolean | Yes | If a blank/empty value is allowed
+| advanced | boolean | Yes | If the value should be only be requested from the user if the user selects advanced mode (if this is set then you should specify a default).
+| options | array | Yes | Value options (see below)
+
+If options are specified, the provided user value must match one of the options specified.
+The option object has the following attributes.
+
+| attribute name | type | optional | value |
+|----------------|----------|------|-------|
+| id | string | No | value to assign to the variable if this option is selected
+| text | string | No | Text to show the user in the user interface
+
+## Conditional
+
+This step will check that a condition string matches the specified value string (naturally you should use template 
+processing to dynamically create those string). If they match it will execute all steps within.
+
+| attribute name | type | optional | value |
+|----------------|----------|------|-------|
+| condition | string | No | Condition string
+| value | string | No | Value string
+| steps | array | No | Steps to execute 
+
 # Files
 
 Each file object supports the following attributes
 
 | attribute name | type | optional | value |
 |----------------|----------|------|-------|
-| id | string | No | Unique id of your template (used when loading the template from the classpath and multiple templates are available) 
 | path | string | No | File path
-| process | boolean | Yes |  if the file's content should be processed through the freemarker template engine
+| process | string | Yes |  if the file's content should be processed through the freemarker template engine
 | content | string | Yes | what encoding should be used when writing the file's content
 | encoding | string | Yes | File's content
 | resource | string | Yes | Path to a resource containing the file's content
-| resourcePath | string | Yes | Location of resource files (defaults to `files`)
 | skip | string | Yes | If this is set to 'true' it will skip writing this file's content
 
 # Archive template
@@ -92,7 +130,7 @@ to the "what is your name?" you would get the result as described
   ],
   "files": [
     { "path": "hello.txt", "resource": "world.txt" },
-    { "path": "somedir/foo.txt" },
+    { "path": "somedir/${myname}.txt" },
   ]
 }
 ```
@@ -123,7 +161,7 @@ bird
 hi john
 ```
 
-### somedir/foo.txt
+### somedir/john.txt
 
 ```
 bar
