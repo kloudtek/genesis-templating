@@ -21,25 +21,18 @@ import java.util.List;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Input extends Step {
     private static final Logger logger = LoggerFactory.getLogger(Input.class);
-    @XmlAttribute(required = true)
     @JsonProperty(required = true)
     protected String var;
-    @XmlAttribute(required = true)
     @JsonProperty(required = true)
     protected String message;
-    @XmlAttribute()
     @JsonProperty()
     protected String description;
-    @XmlAttribute(name = "default")
     @JsonProperty("default")
     protected String defaultValue;
-    @XmlAttribute
     @JsonProperty
     protected boolean blankAllowed;
-    @XmlElement(name = "option")
     @JsonProperty
     protected List<InputOption> options;
-    @XmlAttribute
     @JsonProperty
     protected boolean advanced;
 

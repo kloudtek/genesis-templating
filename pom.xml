@@ -122,7 +122,6 @@
         </extensions>
     </build>
 
-
     <repositories>
         <repository>
             <id>ossrh-snapshot</id>

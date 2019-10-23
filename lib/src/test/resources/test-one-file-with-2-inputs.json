@@ -1,0 +1,18 @@
+{
+  "steps": [
+    {
+      "type": "input",
+      "var": "i1"
+    },
+    {
+      "type": "input",
+      "var": "i2"
+    }
+  ],
+  "files": [
+    {
+      "path": "README.md",
+      "content": "# ${i1} - ${i2}"
+    }
+  ]
+}

@@ -14,6 +14,7 @@ import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class TemplateExecutor {
     private static final Logger logger = LoggerFactory.getLogger(TemplateExecutor.class);
@@ -60,6 +61,27 @@ public class TemplateExecutor {
         defaults.clear();
         steps = template.getSteps();
         files = template.getFiles();
+
+        if( template.getResourceLoader() != null) {
+            // archived or directory template, let's reconciliate it's files with the files
+            // listed in descriptor
+            try {
+                Set<String> archFiles = template.getResourceLoader().listFiles();
+                for (TFile file : files) {
+                    String path = file.getResource() != null ? file.getResource() : file.getPath();
+                    if( path.startsWith("/") ) {
+                        path = path.substring(1);
+                    }
+                    archFiles.remove(path);
+                }
+                for (String f : archFiles) {
+                    template.addFile(f).setResource(f);
+                }
+            } catch (IOException e) {
+                throw new TemplateExecutionException(e);
+            }
+        }
+
         logger.info("Generating template to " + target);
         if (!target.exists()) {
             if (!target.mkdirs()) {

@@ -186,11 +186,14 @@ public class Template {
         this.resourceLoader = resourceLoader;
     }
 
-    public InputStream loadResource(String resourcePath) {
-        if (resourceLoader != null) {
-            return resourceLoader.loadResource(resourcePath);
-        } else {
-            return getClass().getResourceAsStream(resourcePath);
-        }
+    public InputStream getFileResource(String resourcePath) throws IOException {
+        return resourceLoader.loadResource("files/"+resourcePath);
+    }
+
+    public TFile addFile(String path) {
+        TFile f = new TFile(path);
+        f.setTemplate(this);
+        files.add(f);
+        return f;
     }
 }

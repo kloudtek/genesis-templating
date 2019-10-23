@@ -1,0 +1,24 @@
+{
+  "steps": [
+    {
+      "type": "input",
+      "var": "testval",
+      "options": [
+        {
+          "id": "op1",
+          "text": "OPTION 1"
+        },
+        {
+          "id": "op2",
+          "text": "OPTION 2"
+        }
+      ]
+    }
+  ],
+  "files": [
+    {
+      "path": "README.md",
+      "content": "# ${testval}"
+    }
+  ]
+}

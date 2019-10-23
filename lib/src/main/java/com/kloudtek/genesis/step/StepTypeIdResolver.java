@@ -16,7 +16,6 @@ public class StepTypeIdResolver extends TypeIdResolverBase {
 
     public StepTypeIdResolver() {
         mappings.put("input", Input.class);
-        mappings.put("iopt", InputOption.class);
         mappings.put("conditional", ConditionalSteps.class);
     }
 

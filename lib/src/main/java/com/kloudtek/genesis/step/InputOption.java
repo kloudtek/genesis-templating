@@ -5,7 +5,7 @@ import com.kloudtek.genesis.TemplateExecutor;
 
 import javax.xml.bind.annotation.XmlAttribute;
 
-public class InputOption extends Step {
+public class InputOption {
     private String id;
     private String text;
 
@@ -25,14 +25,5 @@ public class InputOption extends Step {
 
     public void setText(String text) {
         this.text = text;
-    }
-
-    @Override
-    public String toString() {
-        return text;
-    }
-
-    @Override
-    public void execute(TemplateExecutor exec) throws TemplateExecutionException {
     }
 }

@@ -6,7 +6,7 @@
     },
     {
       "path": "bar.txt",
-      "resource": "foo.txt"
+      "resource": "foo/foo.txt"
     }
   ]
 }

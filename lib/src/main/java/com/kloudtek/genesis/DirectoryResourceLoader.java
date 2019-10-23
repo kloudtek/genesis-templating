@@ -1,9 +1,7 @@
 package com.kloudtek.genesis;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
+import java.io.*;
+import java.util.*;
 
 public class DirectoryResourceLoader implements ResourceLoader {
     private File dir;
@@ -21,5 +19,22 @@ public class DirectoryResourceLoader implements ResourceLoader {
             //
         }
         return null;
+    }
+
+    @Override
+    public Set<String> listFiles() {
+        HashSet<String> results = new HashSet<>();
+        buildFileList(results, "", new File(dir, "files"));
+        return results;
+    }
+
+    public void buildFileList( HashSet<String> results, String basePath, File dir ) {
+        for (File file : Objects.requireNonNull(dir.listFiles())) {
+            if( file.isDirectory() ) {
+                buildFileList(results,file.getName()+"/",file);
+            } else {
+                results.add(basePath+file.getName());
+            }
+        }
     }
 }

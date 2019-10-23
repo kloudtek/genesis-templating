@@ -25,6 +25,13 @@ public class TFile {
     @XmlAttribute
     private String resource;
 
+    public TFile() {
+    }
+
+    public TFile(String path) {
+        this.path = path;
+    }
+
     public void create(TemplateExecutor exec, File target) throws TemplateExecutionException {
         try {
             File parent = file.getParentFile();
@@ -42,13 +49,8 @@ public class TFile {
     private InputStream getContent(TemplateExecutor exec) throws TemplateExecutionException {
         try {
             if (StringUtils.isNotBlank(resource)) {
-                URLBuilder urlBuilder = new URLBuilder("/files/");
-                if( template.getResourcePath() != null ) {
-                    urlBuilder.path(template.getResourcePath());
-                }
-                urlBuilder.path(exec.filter(resource));
-                String resourcePath = urlBuilder.toString();
-                InputStream is = template.loadResource(resourcePath);
+                String resourcePath = exec.filter(resource);
+                InputStream is = template.getFileResource(resourcePath);
                 if( is == null ) {
                     throw new TemplateExecutionException("File resource missing: " + resourcePath);
                 }
