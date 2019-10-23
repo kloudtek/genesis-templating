@@ -105,7 +105,6 @@ public class TemplatesManagerTest {
         assertFile("slc/plane.txt", "bird");
     }
 
-
     @Test
     public void testFullexampleZip() throws Exception {
         try (TempFile file = new TempFile("gentemptest", ".zip", new File("target"))) {
@@ -119,11 +118,13 @@ public class TemplatesManagerTest {
         }
     }
 
-
-//    @Test(expected = InvalidVariableException.class)
-//    public void testWithInvalidOptionVar() throws Exception {
-//        executeWithVar(TEST_WITH_OPTIONS, "myval", "ba");
-//    }
+    @Test
+    public void testClasspath() throws Exception {
+        executeWithVar("classpath://", "testval", "XX");
+        assertFileCount(2);
+        assertFile("README.md", "XX");
+        assertFile("foo.txt", "vroom");
+    }
 
     private TemplateExecutor executeWithVar(String name, String myval, String foo) throws Exception {
         TemplateExecutor executor = createExecutor(getTestFileUrl(name));

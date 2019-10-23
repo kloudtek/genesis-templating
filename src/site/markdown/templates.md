@@ -18,6 +18,13 @@ resulting file content.
 
 The basic template will consist of a json or yaml file.
 
+When you execute a template, you will need to specify the path to the template. When executing it will attempt to 
+use that path as an URI to retrieve the template. If that fails it will then try to use that path as a filesystem
+path to find the template.
+
+The template path also supports a special scheme `classpath://` which will attempt to find one (and only one) 
+genesis-template.json (or .yml) file.
+
 The top level JSON object can contain the following (optional) high level attributes are supported:
 
 | attribute name | type | optional | value |

@@ -68,6 +68,9 @@ public class Template {
         ObjectMapper objectMapper = new ObjectMapper();
         String lpath = path.toLowerCase();
         File file = null;
+        if( lpath.equals("classpath://") ) {
+            return loadTemplate(new ClasspathResourceLoader());
+        }
         try {
             URL url = new URL(path);
             if (url.getProtocol().equalsIgnoreCase("file")) {

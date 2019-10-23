@@ -1,0 +1,13 @@
+{
+  "id": "test",
+  "files": [
+    {
+      "path": "README.md",
+      "content": "XX"
+    },
+    {
+      "path": "foo.txt",
+      "resource": "car.txt"
+    }
+  ]
+}
