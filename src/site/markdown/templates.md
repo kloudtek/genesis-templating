@@ -44,11 +44,13 @@ Each file object supports the following attributes
 
 | attribute name | type | optional | value |
 |----------------|----------|------|-------|
+| id | string | No | Unique id of your template (used when loading the template from the classpath and multiple templates are available) 
 | path | string | No | File path
 | process | boolean | Yes |  if the file's content should be processed through the freemarker template engine
 | content | string | Yes | what encoding should be used when writing the file's content
 | encoding | string | Yes | File's content
 | resource | string | Yes | Path to a resource containing the file's content
+| resourcePath | string | Yes | Location of resource files (defaults to `files`)
 | skip | string | Yes | If this is set to 'true' it will skip writing this file's content
 
 # Archive template
@@ -58,7 +60,7 @@ zip or a jar archive containing all the file's content.
 
 Such an archive must have the template json (or yaml) in a file named 'genesis-template.json' or 'genesis-template.yml'
 
-Then all the template files should be stored under the path 'files'
+Then all the template files should be stored under the path 'files' or whichever `resourcePath` has been set in template
 
 Those files can then be referred to by the json file object using the 'resource' attribute.
 

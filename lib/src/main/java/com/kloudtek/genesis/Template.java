@@ -23,7 +23,7 @@ public class Template {
     private static final Logger logger = LoggerFactory.getLogger(Template.class);
     private String id;
     private String name;
-    private String resourcePath;
+    private String resourcePath = "files";
     private List<Input> steps;
     private List<TFile> files;
     private boolean overwrite;
@@ -72,7 +72,7 @@ public class Template {
             URL url = new URL(path);
             if (url.getProtocol().equalsIgnoreCase("file")) {
                 file = new File(url.toURI());
-            }else{
+            } else {
                 if (lpath.endsWith(".json")) {
                     return loadJson(url);
                 } else if (lpath.endsWith(".jar") || lpath.endsWith(".zip")) {
@@ -186,8 +186,15 @@ public class Template {
         this.resourceLoader = resourceLoader;
     }
 
-    public InputStream getFileResource(String resourcePath) throws IOException {
-        return resourceLoader.loadResource("files/"+resourcePath);
+    public InputStream getFileResource(String path) throws IOException {
+        StringBuilder fullPath = new StringBuilder(resourcePath.startsWith("/") ? resourcePath.substring(1) : resourcePath);
+        if (resourcePath.endsWith("/") && path.startsWith("/")) {
+            path = path.substring(1);
+        } else if (!resourcePath.endsWith("/") && !path.startsWith("/")) {
+            path = "/" + path;
+        }
+        fullPath.append(path);
+        return resourceLoader.loadResource(fullPath.toString());
     }
 
     public TFile addFile(String path) {
