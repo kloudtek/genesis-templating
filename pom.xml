@@ -154,10 +154,6 @@
             <id>ossrh</id>
             <url>https://oss.sonatype.org/content/repositories/snapshots</url>
         </snapshotRepository>
-        <site>
-            <id>kloudtek-s3-sdocs</id>
-            <url>s3://sdocs.kloudtek.com/genesis-templating</url>
-        </site>
     </distributionManagement>
 
     <profiles>
